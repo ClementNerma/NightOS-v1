@@ -1,0 +1,37 @@
+
+<div id="taskbar">
+	<!-- Equivalent of task bar on Microsoft Windows !-->
+	<div id="launcher"><!-- Equivalent of Start Menu on Microsoft Windows !--></div>
+	<div id="icons"></div>
+	<div id="notif"><!-- Equivalent of notifications area on Microsoft Windows !--></div>
+</div>
+
+<div id="desktop"></div>
+
+<div id="context"></div>
+
+<script type="text/javascript" charset="utf-8">
+
+	$('#context').hide();
+
+	function showDesktop() {
+
+		$('#desktop').html('');
+
+		var files = App.readDir('/users/$USER$/desktop');
+
+		if(typeof(files) !== 'object')
+			throw new Error('NightOS can\'t read the user desktop folder [/users/' + _user_ + '/desktop]. Please check that this directory is readable.');
+
+		for(var i in files) {
+			var f = '/users/' + _user_ + '/desktop/' + files[i];
+			$('#desktop').append(Explorer.DOM.file(f));
+
+		}
+
+	}
+
+	App.watchDir('/users/$USER$/desktop', {initial:false}, showDesktop);
+	showDesktop();
+	
+</script>

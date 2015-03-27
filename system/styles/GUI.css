@@ -1,0 +1,29 @@
+
+#GUI_menuBar {
+
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 40px;
+	z-index: 999999;
+	border-bottom: 1px solid gray;
+
+}
+
+.GUIMenuBarChild {
+
+	display: inline-block;
+	background-color: white;
+	padding: 5px;
+	border-right: 1px solid gray;
+
+}
+
+.GUIMenuBarChild:hover {
+
+	background-color: blue;
+	color: white;
+	cursor: pointer;
+
+}

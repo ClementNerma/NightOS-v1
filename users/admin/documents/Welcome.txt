@@ -1,0 +1,26 @@
+
+Thank you to use NightOS system !
+
+This is the first Alpha Preview of NightOS, so you can't do many things.
+But you can test the OS interface, the file explorer, the terminal, and the text editor !
+
+To launch an application or open a file, just double-click on it.
+On the desktop, you can see some icons who permitte you to access to the different applications.
+
+System update
+=============
+
+When an update is released, you can update your system with the system updater.
+To do that, just double-click on the "system updater" shortcut on the desktop.
+
+In the first alpha preview, you can uniquely update your system by using a signed file.
+
+Text Editor
+===========
+
+Shortcut  Keyboard
+========  ========
+
+Open      Ctrl + O
+Sav e      Ctrl + S
+Quit       Ctrl + Q

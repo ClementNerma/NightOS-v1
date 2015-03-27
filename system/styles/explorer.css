@@ -1,0 +1,28 @@
+
+.explorer-shortcut {
+
+	display: inline-block;
+	margin: 10px;
+	/*border: 1px solid #DCDCDC;*/
+	border: 1px solid transparent;
+	text-align: center;
+
+}
+
+.explorer-shortcut span {
+
+	display: block;
+	padding-bottom: 5px;
+
+}
+
+.explorer-shortcut:hover {
+	cursor: default;
+}
+
+.explorer-shortcut-selected {
+	
+	background-color: #337CE1;
+	border: 1px dashed #DCDCDC;
+
+}

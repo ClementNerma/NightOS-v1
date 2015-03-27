@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Launching NightOS...</title>
+</head>
+<body>
+	<div id="frame"></div>
+
+	<script type="text/javascript" charset="utf-8">
+
+		function fatalError(err) {
+			frame.style.backgroundColor = '#1800F4';
+			frame.style.color = '#FFFFFF';
+			frame.style.position = 'absolute';
+			frame.style.top = '0px';
+			frame.style.left = '0px';
+			frame.style.right = '0px';
+			frame.style.bottom = '0px';
+			frame.style.fontFamily = 'Ubuntu, Open Sans, sans-serif';
+			frame.style.padding = '10px';
+			frame.innerHTML = '<p>' + err + '</p>';
+		}
+
+		var boot  = false;
+		var frame = window.frame = document.getElementById('frame');
+		
+		try {
+			process.chdir('..');
+			var ngui = require('nw.gui').Window.get().enterFullscreen();
+			var fs = require('fs');
+			var boot = true;
+		}
+
+		catch(e) {
+			fatalError('Unable to use NodeJS functions. Make sure you are using Node-WebKit system to run NightOS.');
+		}
+
+		boot: {
+			if(!boot)
+				break boot;
+
+			var directory = process.cwd();
+
+			var files = {
+				'external tool': {
+					directory: 'external_tools',
+					files: ['jquery.min']
+				},
+			
+				system:{
+					directory: 'system',
+					files: ['system', 'core', 'debug', 'AES', 'registry', 'application', 'certificate', 'storage', 'UI', 'explorer', 'windows', 'GUI', 'TaskManager', 'dialogs', 'prototype-extends', 'TextEdit', 'console']
+				}
+			}
+
+			for(var j in files)
+				for(var i = 0; i < files[j].files.length; i++) {
+					var file = files[j].directory + '/' + files[j].files[i] + '.js';
+
+					try {
+						eval(fs.readFileSync(file, 'utf8'));
+					}
+
+					catch(e) {
+						fatalError('Unable to evaluate ' + j + ' file [' + file + '] file. Make sure that this directory is readable<br /><br />Details :<br /><br />' + e.message + '');
+
+						break boot;
+					}
+				}
+
+			delete boot;
+			delete files;
+			delete file;
+			delete fs;
+			delete i;
+			delete data;
+			delete fatalError;
+
+			document.title = 'NightOS - Booting...';
+
+			var Cert = new Certificate(null, 4, {
+
+				'storage': ['*']
+
+			}, ['/*']);
+
+			var App = new Application(Cert, null, null);
+
+			Core.boot();
+		}
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+
+#desktop {
+
+	position: absolute;
+	top: 40px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 10;
+
+}
+
+#taskbar {
+
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 40px;
+	z-index: 11;
+	background-color: #1486FF;
+
+}
+
+#taskbar #icons div {
+
+	display: inline-block;
+	border-right: 1px solid blue;
+	padding: 10px;
+	overflow: hidden;
+
+}
+
+#taskbar #notif {
+
+	float: right;
+
+}
+
+.window {
+
+	z-index: 15;
+	position: absolute;
+	border: 1px solid gray;
+	top: 10%;
+	left: 10%;
+	width: 640px;
+	height: 480px;
+	background-color: white;
+
+}
+
+.window .title {
+
+	padding: 5px;
+	background-color: #1486FF;
+	color: black;
+
+}
+
+.window .maximize, .window .close {
+
+	display: inline-block;
+	float: right;
+	color: #FFFFFF;
+	width: 30px;
+	text-align: center;
+	vertical-align: middle;
+	margin-top: -2px;
+	padding: 2px;
+
+}
+
+.window .maximize {
+
+	background-color: #487BFD;
+
+}
+
+.window .close {
+
+	background-color: #F05252;
+
+}
+
+.window .maximize:hover, .window .close:hover {
+
+	cursor: pointer;
+
+}
+
+.window .content, .window iframe {
+
+	border: 0;
+	overflow: hidden;
+	outline: 0;
+	width: 100%;
+	height: 100%;
+
+}
+
+.window.maximized {
+
+	position: absolute;
+	top: 40px;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	width: auto;
+	height: auto;
+	z-index: 99999;
+
+}

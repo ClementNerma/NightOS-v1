@@ -1,0 +1,37 @@
+
+#users, #form {
+	position: absolute;
+	top: 40%;
+	left: 10%;
+	right: 10%;
+}
+
+#users img {
+	margin-right: 20px;
+}
+
+#users img:hover {
+	cursor: pointer;
+}
+
+#user, #password {
+	display: block;
+	margin-bottom: 5px;
+}
+
+#login {
+	margin-top: 15px;
+}
+
+#nightos {
+	display: block;
+	position: absolute;
+	top: 10%;
+	left: 30%;
+	font-size: 30px;
+	letter-spacing: 5px;
+}
+
+#user-icon {
+	position: absolute;
+}

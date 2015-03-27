@@ -1,0 +1,60 @@
+
+#ui-dialog-shadow {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: transparent;
+	z-index: 9999998;
+}
+
+.ui-dialog {
+	position: absolute;
+	z-index: 10000;
+	border-radius: 5px;	
+	border: 1px solid #4D5268;
+	background-color: #E9E9E9;
+	z-index: 9999999;
+}
+
+.ui-dialog, .ui-dialog-title, .ui-dialog-content, ,.ui-dialog-buttons, .ui-dialog-right-content {
+
+	max-width: 650px;
+
+}
+
+.ui-dialog div {
+	padding: 5px;
+}
+
+.ui-dialog-title {
+	background-color: #4D5268;
+	color: #DCDCDC;
+}
+
+.ui-dialog-content {
+	text-align: justify;
+}
+
+.ui-dialog-buttons {
+	float: right;
+}
+
+.ui-dialog-buttons button {
+	margin-left: 15px;
+}
+
+.ui-dialog-left-image {
+	display: inline;
+	float: left;
+	height: 64px;
+	vertical-align: top;
+	margin-right: 10px;
+}
+
+.ui-dialog-right-content {
+	display: inline;
+	height: 64px;
+	vertical-align: top;
+}

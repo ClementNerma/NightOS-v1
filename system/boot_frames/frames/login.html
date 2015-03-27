@@ -1,0 +1,71 @@
+
+<h1 id="nightos">Welcome to Night OS</h1>
+
+<div id="users" class="panel">
+	<div align="center">
+		<h1 id="username">Please login</h1>
+	</div>
+
+	<div id="gallery"></div>
+</div>
+
+<div id="form" class="panel">
+	<div align="center" style="margin-top: 100px;">
+		<input type="password" id="password" placeholder="Password" />
+		<button id="login">Login</button>
+	</div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+
+	var users = fs.readdirSync('users');
+	var user  = null;
+
+	for(var i in users)
+		if(fs.lstatSync('users/' + users[i]).isDirectory())
+			$('#gallery').append($(new Image()).click(function() {
+				user = this.getAttribute('user');
+
+				$('#form input').val('');
+
+				var img = $(this).clone().css({
+					position: 'absolute',
+					top: this.offsetTop + this.parentNode.offsetTop + this.parentNode.parentNode.offsetTop,
+					left: this.offsetLeft + this.parentNode.offsetLeft + this.parentNode.parentNode.offsetLeft
+				});
+
+				$('#users').hide();
+				$('#frame').append(img);
+
+				$('#form').show(1000, function() {
+					$('#password').focus();
+				});
+
+				img.animate({
+					top: document.getElementById('form').offsetTop + 10,
+					left: document.body.offsetWidth / 2 - 32
+				}, 1000);
+			}).attr('user', users[i]).attr('src', 'data:image/png;base64,' + Core.users.get(users[i]).picture)).attr('title', 'Login as ' + users[i]);
+
+	$('#form').hide();
+	$('#users').hide().fadeIn(1000);
+
+	$('#form input').keypress(function(e) {
+		if(e.keyCode === 13) {
+			$('#login').click();
+		}
+	});
+
+	$('#login').click(function() {
+		if(!Core.users.loginAs(user, $('#password').val()))
+			return Dialogs.error('Login', 'The username or password is incorrect. Please check and retry.', function() {
+				$('#password').val('').focus();
+			});
+
+		$('#nightos, #form, img').fadeOut(1000, function() {
+			Core.path.chdir('/users/$USER$/');
+			loadSystemFrame('desktop');
+		});
+	});
+
+</script>

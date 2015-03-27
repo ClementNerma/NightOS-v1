@@ -1,0 +1,14 @@
+{
+	"name": "Terminal",
+	"version": "0.1",
+	"icon": "",
+	"creator": "Clément Nerma",
+
+	"permissions": {
+		"storage": ["*"]
+	},
+
+	"access": ["/*"],
+
+	"rights": "herit"
+}

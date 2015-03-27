@@ -1,0 +1,7 @@
+
+/* Set system fonts */
+
+@font-face {
+	font-family: 'Ubuntu';
+	src: url('[ROOT_PATH]/system/styles/fonts/Ubuntu.woff');
+}

@@ -1,0 +1,8 @@
+{
+	"main": "../NightOS.html",
+	"name": "NightOS",
+
+	"window": {
+		"toolbar": true
+	}
+}

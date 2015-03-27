@@ -1,0 +1,153 @@
+
+/* Set system fonts */
+
+@font-face {
+	font-family: 'Ubuntu';
+	src: url('[ROOT_PATH]/system/styles/fonts/Ubuntu.woff');
+}
+
+/* Format system tags */
+
+#context {
+
+	position: absolute;
+	background-color: white;
+	color: black;
+	z-index: 999999;
+
+}
+
+#context span {
+
+	display: block;
+	padding: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
+
+	background-color: white;
+	color: black;
+	-webkit-transition: background-color 100ms linear, color 100ms linear;
+
+}
+
+#context span:hover {
+
+	background-color: #5262FF;
+	color: white;
+	-webkit-transition: background-color 100ms linear, color 100ms linear;
+	color: white;
+	cursor: default;
+
+}
+
+/* Format UI tags */
+
+* {
+	font-family: 'Ubuntu', Ubuntu, Open Sans, sans-serif;
+	font-size: 16px;
+	letter-spacing: 1px;
+}
+
+input, button {
+	letter-spacing: 2px;
+}
+
+p, .read {
+	text-align: justify;
+}
+
+.zoom {
+	font-size: 24px;
+	letter-spacing: 4px;
+}
+
+.panel {
+	background-color: #E9E9E9;
+	padding: 20px;
+	border-radius: 10px;
+}
+
+.full-width {
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+/* Format default tags */
+
+strong, b {
+	font-weight: bold;
+}
+
+em, i {
+	font-style: italic;
+}
+
+u {
+	text-decoration: underline;
+}
+
+/* Set frame tag to fullscreen mode */
+
+body {
+
+	overflow: hidden;
+
+}
+
+#frame {
+
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	color: black;
+	z-index: 0;
+	padding: 10px;
+	background-color: #8BE0F2;
+	overflow: hidden;
+
+}
+
+/* Set UI tags */
+
+input[type="text"], input[type="password"], input[type="number"], input[type="email"] {
+	border: 1px solid #ABCDEF;
+	border-radius: 5px;
+	padding: 7px;
+	padding-left: 10px;
+	padding-right: 10px;
+	height: 20px;
+	outline: none;
+}
+
+input[type="text"]:hover, input[type="password"]:hover, input[type="number"]:hover, input[type="email"]:hover {
+	border: 1px solid #5888F4;
+	outline: none;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus, input[type="email"]:focus {
+	border: 1px solid #1B64E8;
+	outline: none;
+}
+
+button, input[type="button"], input[type="submit"] {
+	outline: none;
+	padding: 5px;
+	border-radius: 5px;
+	background-color: #FFFFFF;
+	color: #000000;
+	border: 2px outset #C4C4C4;
+}
+
+button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+	cursor: pointer;
+}
+
+button:active, input[type="button"]:active, input[type="submit"]:active {
+	cursor: pointer;
+	background-color: #FF8869;
+	border: 2px inset #FF8869;
+}

@@ -1,0 +1,37 @@
+
+/* Format TextEdit elements */
+
+textarea[EditorID].text-editor {
+
+	opacity: 1;
+
+	color: #000000;
+	-webkit-text-fill-color: transparent;
+
+	border: 0px solid transparent;
+	background: transparent;
+
+}
+
+pre[EditorID].text-editor-underground {
+
+	color: white;
+	position: absolute;
+	z-index: -1;
+
+}
+
+textarea[EditorID].text-editor, pre[EditorID].text-editor-underground, pre[EditorID].text-editor-underground * {
+
+	overflow: auto;
+	margin: 0;
+	padding: 0;
+	outline: 0;
+
+	tab-size: 4;
+
+	line-height: 20px;
+	font-family: "Ubuntu", Ubuntu;
+	font-size: 15px;
+
+}

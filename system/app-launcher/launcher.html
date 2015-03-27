@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Application launcher</title>
+	<script type="text/javascript" charset="utf-8">
+
+	var fs = require('fs');
+
+		function injectJS(code) {
+
+			eval(code);
+
+		}
+
+		function launch(name, args, vars, frames, WinGUI, cert, frame_ID, root) {
+
+			process.on('uncaughtException', function(err) {
+				var frame = document.body;
+				frame.style.backgroundColor = '#1800F4';
+				frame.style.color = '#FFFFFF';
+				frame.style.position = 'absolute';
+				frame.style.top = '0px';
+				frame.style.left = '0px';
+				frame.style.right = '0px';
+				frame.style.bottom = '0px';
+				frame.style.fontFamily = 'Ubuntu, Open Sans, sans-serif';
+				frame.style.padding = '10px';
+				frame.innerHTML = '<p>' + err + '</p>';
+			});
+
+			window.WinGUI = WinGUI;
+			var appLauncherRootPath = window.appLauncherRootPath = root;
+
+			var boot  = false;
+			var frame = window.frame = document.getElementById('frame');
+
+			// Indicate to Core and special functions that the frame is the application launcher
+			var appLauncher = window.appLauncher = true;
+			
+			try {
+				var fs = require('fs');
+				var boot = true;
+			}
+
+			catch(e) {
+				throw new Error('Unable to use NodeJS functions. Make sure you are using Node-WebKit system to run NightOS.');
+			}
+
+			boot: {
+				if(!boot)
+					break boot;
+
+				name = name.replace(/[^a-zA-Z0-9 _\-]/g, '');
+				window.app_name = name;
+
+				try {
+					if(fs.lstatSync(root + '/system/apps/' + name).isDirectory())
+						var directory = root + '/system/apps/' + name;
+					else if(fs.lstatSync(root + '/apps/' + name).isDirectory())
+						var directory = root + '/apps/' + name;
+					else
+						throw new Error('Application not found [' + name + ']');
+				}
+
+				catch(e) {
+					throw new Error('Application not found [' + name + ']')
+				}
+
+				window.directory = directory;
+
+				var files = {
+					'external tool': {
+						directory: 'external_tools',
+						files: ['jquery.min']
+					},
+
+					system:{
+						directory: 'system',
+						files: ['system', 'core', 'debug',
+						 'AES', 'registry', 'application', 'certificate', 'storage', 'UI', 'explorer', 'GUI', 'dialogs', 'prototype-extends', 'TextEdit', 'console']
+					}
+				}
+
+				for(var j in files)
+					for(var i = 0; i < files[j].files.length; i++) {
+						var file = require('path').normalize(root + '/' + files[j].directory + '/' + files[j].files[i] + '.js');
+
+						try {
+							window.eval(fs.readFileSync(file, 'utf8'));
+						}
+
+						catch(e) {
+							throw new Error('Unable to evaluate ' + j + ' file [' + file + '] file. Make sure that this directory is readable<br /><br />Details :<br /><br />' + e.message + '');
+
+							break boot;
+						}
+					}
+
+				var app = fs.readFileSync(directory + '/app.js', 'utf8');
+
+				var package = JSON.parse(fs.readFileSync(directory + '/package.prm', 'utf8'));
+
+				//var Cert = new Certificate(package.ID, package.rights, package.permissions, package.access);
+				var App = new Application(cert, app);
+
+				try {
+
+					var launcher = App.getLauncher();
+
+				}
+
+				catch(e) {
+					console.error('[Application launcher] Invalid or corrupted application [' + name + ']' + "\n" + 'Details : ' + e.message);
+					console.error(App, Cert, args);
+					throw new Error('Application launcher : Application is invalid [' + name + ']');
+				}
+
+				delete boot;
+				delete files;
+				delete file;
+				delete require;
+				delete fs;
+				delete window.fs;
+				delete i;
+				delete data;
+				delete fatalError;
+
+				document.title = 'NightOS - Booting...';
+
+				Core.boot(true);
+
+				App.call = {
+					time: new Date().getTime(),
+					arguments: args
+				}
+
+				App.name = name;
+				App.ID   = frame_ID;
+
+				Object.freeze(App);
+				Object.freeze(App.events);
+				Object.freeze(App.dialog);
+
+				Object.freeze(cert);
+
+				window.App  = App;
+				window.Cert = cert;
+
+				for(var i in vars)
+					Core.vars.set(i, vars[i]);
+
+				window.frames = frames;
+				window.launcher = launcher;
+				window.GUI = new GUI();
+
+				delete global;
+
+				window.evalApp = setInterval(function() {
+
+					if(window.readyToLaunch) {
+
+						delete launch;
+						clearInterval(window.evalApp);
+
+						window.eval(window.launcher);
+
+					}
+
+				}, 100);
+
+			}
+
+		}
+
+	</script>
+</head>
+<body></body>
+</html>

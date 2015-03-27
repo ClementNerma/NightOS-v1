@@ -1,0 +1,13 @@
+{
+	"name": "Explorer",
+	"version": "0.1",
+	"icon": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABLUlEQVR4nO3SsWrCUBSA4TtInQSlQzso0q6+R9110mewb6Hg4lT7AA4uDooSlT6Bji4u1QQFCYpgpEvHuAUEEUG95wb/H86ce74cpYiI6LjSZJP9nGw+dE1j9fcsvXNQ0ppVI+1fX/dI7x2UHjo1AAAA4HEBMj+L8qtl73TOi2V70ns/dlPff5I4e8k5Aoh25B+ke2Ld2X8AIP0Y8SuQfggAAAAAAAAAAAAAAAAAYB5Ac7l/D+u01vu3qwGUUqq73cZSA+cr1be/QzFDp97xvPglu10EIH2q15w4AAAAAAAAAABwfwClOSMBTPmzAAAAAAAAAAAAAAAAAAAAAAAAgD6ARG9eSfTm5TtPxVgAnd0UoDhyc6emMHbzYQcojN38ud1u+jGdmfgmIqLQdQBQlx1Vq5nKkAAAAABJRU5ErkJggg==",
+	"creator": "Clément Nerma",
+
+	"permissions": {
+		"storage": ["*"]
+	},
+
+	"access": ["/*"],
+	"rights": "herit"
+}

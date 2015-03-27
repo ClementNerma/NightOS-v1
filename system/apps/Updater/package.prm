@@ -1,0 +1,13 @@
+{
+	"name": "System Updater",
+	"version": "0.1",
+	"icon": "",
+	"creator": "Clément Nerma",
+
+	"permissions": {
+		"storage": ["*"]
+	},
+
+	"access": ["/*"],
+	"rights": 4
+}
