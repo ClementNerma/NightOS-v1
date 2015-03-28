@@ -133,12 +133,13 @@ var Storage = window.Storage = new function() {
 
 		App.pushStack(0);
 
-		var path = authorize('readFile');
+		//var path = authorize('readFile');
+		var path = Core.path.format(file);
 
-		if(!path) {
+		/*if(!path) {
 			App.pushStack(-1);
 			return false;
-		}
+		}*/
 
 
 		if(!this.fileExists(path))
@@ -200,12 +201,14 @@ var Storage = window.Storage = new function() {
 
 		App.pushStack(0);
 
-		from = authorize('moveFile');
+		/*from = authorize('moveFile');
 
 		if(!from) {
 			App.pushStack(-1);
 			return false;
-		}
+		}*/
+
+		from = Core.path.format(from);
 
 		if(!App.fileExists(from))
 			return Debug.error('The origin file doesn\'t exists', from);
@@ -427,12 +430,14 @@ var Storage = window.Storage = new function() {
 
 		App.pushStack(0);
 
-		var path = authorize('readDir');
+		/*var path = authorize('readDir');
 
 		if(!path) {
 			App.pushStack(-1);
 			return false;
-		}
+		}*/
+
+		var path = Core.path.format(directory);
 
 		if(!this.directoryExists(path))
 			return false;
@@ -458,12 +463,14 @@ var Storage = window.Storage = new function() {
 
 		App.pushStack(0);
 
-		var path = authorize('readDirFiles');
+		/**var path = authorize('readDirFiles');
 
 		if(!path) {
 			App.pushStack(-1);
 			return false;
-		}
+		}*/
+
+		var path = Core.path.format(directory);
 
 		if(!this.directoryExists(path))
 			return false;
@@ -491,12 +498,14 @@ var Storage = window.Storage = new function() {
 
 		App.pushStack(0);
 
-		var path = authorize('readSubDirs');
+		/**var path = authorize('readSubDirs');
 
 		if(!path) {
 			App.pushStack(-1);
 			return false;
-		}
+		}*/
+
+		var path = Core.path.format(directory);
 
 		if(!this.directoryExists(path))
 			return false;

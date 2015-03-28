@@ -30,7 +30,13 @@ var Core = window.Core = new function() {
 
 		this.hash = function(str) {
 
-			return _cr.createHash('sha384').update(str).digest('hex');
+			try {
+				return _cr.createHash('sha384').update(str).digest('hex');
+			}
+
+			catch(e) {
+				return false;
+			}
 
 		}
 
@@ -51,7 +57,13 @@ var Core = window.Core = new function() {
 			if(typeof(keylen) !== 'number')
 				var keylen = 48;
 
-			return _cr.pbkdf2Sync(pass, salt, iterations, keylen).toString('hex');
+			try {
+				return _cr.pbkdf2Sync(pass, salt, iterations, keylen).toString('hex');
+			}
+
+			catch(e) {
+				return false;
+			}
 
 		}
 
@@ -162,7 +174,7 @@ var Core = window.Core = new function() {
 
 
 			_user = usr;
-			_admin = (usr.rights === 2);
+			_admin = (usr.rights === 3);
 
 			return true;
 
@@ -214,6 +226,49 @@ var Core = window.Core = new function() {
 		var fs = require('fs');
 
 		/**
+		  * Get an application
+		  * @param {string} name Application name
+		  * @return {Object|Boolean} Return false if an error occurred
+		  */
+
+		this.get = function(name) {
+
+			var app = {
+				isSystem: false
+			};
+
+			name = name.replace(/[^a-zA-Z0-9 _\-]/g, '');
+
+			if(App.directoryExists('/system/apps/' + name)) {
+				var directory = '/system/apps/' + name;
+				app.isSystem = true;
+			} else if(App.directoryExists('/apps/' + name))
+				var directory = '/apps/' + name;
+			else
+				return Debug.error('Application getter', 'Application directory wasn\'t found', name);
+
+			try {
+				app.package = JSON.parse(App.readFile(directory + '/package.prm'));
+			}
+
+			catch(e) {
+				return Debug.error('Application getter', 'Invalid application package', name);
+			}
+
+			if(App.fileExists(directory + '/app.js'))
+				app.launcher = App.readFile(directory + '/app.js');
+
+			if(App.fileExists(directory + '/cmd.js'))
+				app.commandLine = App.readFile(directory + '/cmd.js');
+
+			if(App.fileExists(directory + '/uninstaller.js'))
+				app.uninstaller = App.readFile(directory + '/uninstaller.js');
+
+			return app;
+
+		}
+
+		/**
 		 * Launch an application
 		 * @param {string} name Application name
 		 * @param {Object} args Arguments to pass to application instance
@@ -225,8 +280,8 @@ var Core = window.Core = new function() {
 
 		this.launch = function(name, args, adminPass) {
 
-			if(typeof(adminPass) !== 'undefined' && !Core.users.isAdminPassword(adminPass))
-				return Dialogs.error('Application launcher', 'The password you entered is incorrect.');
+			if(typeof(adminPass) !== 'undefined' && adminPass !== null && !Core.users.isAdminPassword(adminPass) && !((adminPass == true || adminPass == 'true') && Core.users.isAdmin()))
+				return Dialogs.error('Application launcher', 'The password you entered is incorrect');
 
 			var App = window.App;
 
@@ -250,6 +305,17 @@ var Core = window.Core = new function() {
 			if(package.rights === 'herit')
 				package.rights = parseInt(Core.vars.get('rights'));
 
+			if(package.rights.substr(0, 6) === 'herit<') {
+
+				var r = parseInt(Core.vars.get('rights'));
+
+				if(r >= parseInt(package.rights.substr(6, 1)))
+					r = parseInt(package.rights.substr(6, 1)) - 1;
+
+				package.rights = r;
+
+			}
+
 			if(package.rights !== 1 && package.rights !== 2 && package.rights !== 3 && package.rights !== 4)
 				return Dialogs.error('Application launcher', 'This application require invalid rights ' + package.rights);
 
@@ -263,11 +329,18 @@ var Core = window.Core = new function() {
 				window.toLaunchApp = name;
 				window.toLaunchAppArgs = args;
 
-				return Dialogs.input('User account control', 'The ' + name + ' application require a rights level which require admin rights.<br />Please input the admin password :', 'password', function(pass) {
+				if(!Core.users.isAdmin())
+					return Dialogs.input('User account control', 'The ' + name + ' application require a rights level which require admin rights.<br />Please input the admin password :', 'password', function(pass) {
 
-					Core.applications.launch(window.toLaunchApp, window.toLaunchAppArgs, pass);
+						Core.applications.launch(window.toLaunchApp, window.toLaunchAppArgs, pass);
 
-				});
+					});
+				else
+					return Dialogs.confirm('User account control', 'The ' + name + ' application require a rights level which require admin rights.<br />Do you want to continue ?', function(pass) {
+
+						Core.applications.launch(window.toLaunchApp, window.toLaunchAppArgs, true);
+
+					});
 			}
 
 			if(!this.frames[name])
@@ -590,7 +663,7 @@ var Core = window.Core = new function() {
 				else if(App.lastStack(-1))
 					con.error('Needs privileges elevation');
 				else
-					con.error('An error was occured.');
+					con.error('An error has occured.');
 
 			},
 
@@ -603,7 +676,7 @@ var Core = window.Core = new function() {
 				else if(App.lastStack(-1))
 					con.error('Needs privileges elevation');
 				else
-					con.error('An error was occured.');
+					con.error('An error has occured.');
 
 			},
 
@@ -614,7 +687,7 @@ var Core = window.Core = new function() {
 				else if(App.lastStack(-1))
 					con.error('Needs privileges elevation');
 				else
-					con.error('An error was occured.');
+					con.error('An error has occured.');
 
 			},
 
@@ -625,7 +698,7 @@ var Core = window.Core = new function() {
 				else if(App.lastStack(-1))
 					con.error('Needs privileges elevation');
 				else
-					con.error('An error was occured.');
+					con.error('An error has occured.');
 
 			},
 
@@ -636,7 +709,7 @@ var Core = window.Core = new function() {
 				else if(App.lastStack(-1))
 					con.error('Needs privileges elevation');
 				else
-					con.error('An error was occured.');
+					con.error('An error has occured.');
 
 			},
 
@@ -652,7 +725,7 @@ var Core = window.Core = new function() {
 				else if(App.lastStack(-1))
 					con.error('Needs privileges elevation');
 				else
-					con.error('An error was occured.');
+					con.error('An error has occured.');
 
 
 			},
@@ -661,7 +734,7 @@ var Core = window.Core = new function() {
 
 				if(args[0])
 					if(!Core.path.chdir(args[0]))
-						con.error('An error was occured.');
+						con.error('An error has occured.');
 					else
 						con.write('Successfully changed path.');
 				else
@@ -672,7 +745,7 @@ var Core = window.Core = new function() {
 			js: function(args, con) {
 
 				try { con.write(new Function(args[0])()) }
-				catch(e) { con.error('An error was occured : ' + new String(e)); }
+				catch(e) { con.error('An error has occured : ' + new String(e)); }
 
 			}
 
@@ -707,9 +780,29 @@ var Core = window.Core = new function() {
 			
 			args.splice(0, 1);
 			
-			if(typeof(native[cmd_name]) !== 'function')
-				con.error('Command not found : ' + cmd_name);
-			else
+			if(typeof(native[cmd_name]) !== 'function') {
+
+				console.log('will get app');
+
+				var app = Core.applications.get(cmd_name);
+
+				console.log('end get');
+
+				if(app) {
+					window.nextcmd = app;
+					window.nextcon = con;
+					window.nextargs = args;
+					
+					if(!app.isSystem)
+						Dialogs.confirm('Command line interpreter', 'The command you will run will be use the current application rights. Continue uniquely if you\'re sure about what you are doing.', function() {
+							new Function(['con', 'args'], window.nextcmd.commandLine)(window.nextcon, window.nextargs);
+						});
+					else
+						new Function(['con', 'args'], app.commandLine)(window.nextcon, args);
+
+ 				} else
+					con.error('Command not found : ' + cmd_name);
+			} else
 				native[cmd_name](args, con);
 
 		}
@@ -910,7 +1003,7 @@ process.on('uncaughtException', function(e) {
 	console.log('[process catch error] ', e);
 
 	if(!e.stack.contains('/system/app-launcher/launcher.html'))
-		Core.fatalError('An error was occured', e);
+		Core.fatalError('An error has occured', e);
 
 });
 

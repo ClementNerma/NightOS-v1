@@ -35,6 +35,7 @@ var Debug = new function() {
 	this.error = function(msg) {
 
 		var args = arguments;
+
 		args.splice(0, 1);
 
 		_errors.push({

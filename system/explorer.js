@@ -126,14 +126,18 @@ var Explorer = window.Explorer = new function() {
 					var ctx = [{
 						title: "Open",
 						path: shortcut
+					}, {
+						title: "Run as administrator",
+						path: shortcut,
+						runAsAdmin: true
 					}].concat(Registry.read('filesys/' + ext + '/context') || []).concat(Registry.read('filesys/file/context'));
 			
 			$('#context').hide().html('');
 
 			for(var i in ctx)
-				$('#context').append($(document.createElement('span')).html(ctx[i].title).attr('file', shortcut).attr('shortcut', ctx[i].path).click(function() {
+				$('#context').append($(document.createElement('span')).html(ctx[i].title).attr('file', shortcut).attr('shortcut', ctx[i].path).attr('run-as-admin', ctx[i].runAsAdmin).click(function() {
 					$('.explorer-shortcut-selected').removeClass('explorer-shortcut-selected');
-					Explorer.open(this.getAttribute('shortcut'), this.getAttribute('file'));
+					Explorer.open(this.getAttribute('shortcut'), this.getAttribute('file'), this.getAttribute('run-as-admin'));
 					$('#context').hide();
 				}));
 
@@ -196,20 +200,21 @@ var Explorer = window.Explorer = new function() {
  	  * Open a file
  	  * @param {string} path File or application path
  	  * @param {string} file Original file path
+ 	  * @param {Boolean} runAsAdmin Specify if you want to launch the file as administrator.
  	  * @return {Boolean} Return true on opening success
  	  */
 
- 	 this.open = function(path, file) {
+ 	 this.open = function(path, file, runAsAdmin) {
 
  	 	if(path.substr(0, 4) === 'app:')
  	 		return Core.applications.launch(path.substr(4), {
  	 			origin: 'System'
- 	 		});
+ 	 		}, runAsAdmin);
 
  	 	if(path.substr(0, 4) === 'sys:')
- 	 		if(typeof(eval(path.substr(4))) === 'function') {
- 	 			console.log('open : ' + path.substr(4), file);
-				return eval(path.substr(4))(file, file);
+ 	 		if(typeof(Explorer.FileSystem[path.substr(4)]) === 'function') {
+ 	 			//console.log('open : ' + path.substr(4), file);
+				return Explorer.FileSystem[path.substr(4)](file, file);
 			}
 			else
 				return Dialogs.error('File opener - Open failed', 'Cannot find system function : ' + path.substr(4))
@@ -227,7 +232,7 @@ var Explorer = window.Explorer = new function() {
  	 		var sht = this.shortcuts.read(path);
 
  	 		if(sht)
- 				return this.open(sht.path, file);
+ 				return this.open(sht.path, file, runAsAdmin);
  		}
 
  	 	var real_path = path;
@@ -247,13 +252,13 @@ var Explorer = window.Explorer = new function() {
 	 			openFile: real_path,
 	 			origin: 'System',
 	 			from: App.name
-	 		});
+	 		}, runAsAdmin);
 	 	else
 	 		return Core.applications.launch(app, {
 	 			openFile: real_path,
 	 			origin: 'System',
 	 			from: App.name
-	 		});
+	 		}, runAsAdmin);
 
  	}
 

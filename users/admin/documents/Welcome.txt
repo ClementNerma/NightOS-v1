@@ -23,4 +23,4 @@ Shortcut  Keyboard
 
 Open      Ctrl + O
 Save      Ctrl + S
-Quit       Ctrl + Q
+Quit      Ctrl + Q

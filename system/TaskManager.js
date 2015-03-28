@@ -86,3 +86,9 @@ var TaskManager = new function() {
 	}
 
 }
+
+setInterval(function() {
+
+	TaskManager.refresh();
+
+}, 1000);
