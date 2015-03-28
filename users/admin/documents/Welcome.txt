@@ -11,7 +11,7 @@ System update
 =============
 
 When an update is released, you can update your system with the system updater.
-To do that, just double-click on the "system updater" shortcut on the desktop.
+To do that, just double-click on a file update (*.upk) to update it.
 
 In the first alpha preview, you can uniquely update your system by using a signed file.
 
@@ -22,5 +22,5 @@ Shortcut  Keyboard
 ========  ========
 
 Open      Ctrl + O
-Sav e      Ctrl + S
+Save      Ctrl + S
 Quit       Ctrl + Q
