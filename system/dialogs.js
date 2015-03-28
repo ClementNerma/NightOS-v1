@@ -136,7 +136,7 @@ var Dialogs = window.Dialogs = new function() {
 
 		validate = callback.fusion(this.close);
 
-		Dialogs.dialog(title, '<span class="ui-dialog-left-image"><img width="64" height="64" src="data:image/png;base64,' + Registry.read('dialogs/question/icon') + '" /></span><span class="ui-dialog-right-content">'+ content + '</span><br /><br /><input type="' + type + '" />', {OK: function() {
+		Dialogs.dialog(title, '<span class="ui-dialog-left-image"><img width="64" height="64" src="data:image/png;base64,' + Registry.read('dialogs/input/icon') + '" /></span><span class="ui-dialog-right-content">'+ content + '</span><br /><br /><input type="' + type + '" />', {OK: function() {
 			Dialogs.callback()(this.parentNode.parentNode.getElementsByTagName('input')[0].value, this.parentNode.parentNode.getElementsByTagName('input')[0]);
 		}});
 	}

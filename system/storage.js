@@ -29,7 +29,7 @@ var Storage = window.Storage = new function() {
 
 		if((!args[0].hasAccess(path) && !ignorePath && !isReadableSystemFolder) || !args[0].hasPermission(['storage', funcName.replace(/([a-z])([A-Z])/g, function(a, b, c) { return b + '_' + c.toLowerCase(); })]))
 			return Debug.error(System.errors.NOPERM);
-			//throw new Error(System.errors.NOPERM);
+			//console.log(path);
 
 		if(Core.backtrace.getCaller().arguments.callee.caller !== Application.prototype[funcName])
 			return Debug.error(System.errors.NO_APP_CALLER);
@@ -200,15 +200,25 @@ var Storage = window.Storage = new function() {
 
 		App.pushStack(0);
 
-		from = authorize('copyFile');
+		from = authorize('moveFile');
 
 		if(!from) {
 			App.pushStack(-1);
 			return false;
 		}
 
-		if(!_cert.hasAccess(destFile))
-			return false;
+		if(!App.fileExists(from))
+			return Debug.error('The origin file doesn\'t exists', from);
+
+		destFile = Core.path.format(destFile);
+
+		if(App.directoryExists(destFile))
+			destFile = Core.path.format(destFile + '/' + from.split('/')[from.split('/').length - 1]);
+
+		if(!_cert.hasAccess(destFile)) {
+			App.pushStack(-1);
+			return Debug.error(System.errors.NOPERM, destFile);
+		}
 			//throw new Error(System.errors.NOPERM);
 
 		var BUFF_LENGTH;
@@ -236,6 +246,8 @@ var Storage = window.Storage = new function() {
 		    pos += bytesRead
 	    }
 
+    	//fs.unlinkSync(srcFile); don't remove the file because it's just a copy and not a move
+
 	    fs.closeSync(fdr)
 	    fs.closeSync(fdw)
 
@@ -255,16 +267,26 @@ var Storage = window.Storage = new function() {
 
 		App.pushStack(0);
 
-		from = authorize('moveFile');
+		srcFile = authorize('moveFile');
 
-		if(!from) {
+		if(!srcFile) {
 			App.pushStack(-1);
 			return false;
 		}
 
-		if(!_cert.hasAccess(destFile))
-			return false;
+		if(!App.fileExists(srcFile))
+			return Debug.error('The origin file doesn\'t exists', srcFile);
+
+		destFile = Core.path.format(destFile);
+
+		if(App.directoryExists(destFile))
+			destFile = Core.path.format(destFile + '/' + srcFile.split('/')[srcFile.split('/').length - 1]);
+
+		if(!_cert.hasAccess(destFile)) {
+			App.pushStack(-1);
+			return Debug.error(System.errors.NOPERM, destFile);
 			//throw new Error(System.errors.NOPERM);
+		}
 
 		var BUFF_LENGTH;
 
@@ -277,7 +299,7 @@ var Storage = window.Storage = new function() {
 		if(BUFF_LENGTH > System.FileSystem.maxBufferLength)
 			throw new Error(System.errors.BUFFER_TOO_LARGE);
 
-		var _buf = new Buffer(BUFF_LENGTH);
+		var _buff = new Buffer(BUFF_LENGTH);
 
 	    var fdr = fs.openSync(srcFile, 'r')
 	    var stat = fs.fstatSync(fdr)
@@ -286,7 +308,7 @@ var Storage = window.Storage = new function() {
 	    var pos = 0
 
 	    while (bytesRead > 0) {
-		    bytesRead = fs.readSync(fdr, _buff, 0, BUF_LENGTH, pos)
+		    bytesRead = fs.readSync(fdr, _buff, 0, BUFF_LENGTH, pos)
 		    fs.writeSync(fdw, _buff, 0, bytesRead)
 		    pos += bytesRead
 	    }
@@ -353,7 +375,7 @@ var Storage = window.Storage = new function() {
 			//throw new Error('The path already exists [' + path + ']');
 
 		try {
-			fs.mkdirSync(directory);
+			fs.mkdirSync(path);
 			return true;
 		}
 

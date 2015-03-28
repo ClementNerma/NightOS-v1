@@ -30,7 +30,9 @@ Application.prototype.getLauncher = function() { return this.app; }
 
 /* System app functions */
 
-Application.prototype.quit = function() { return quitApp(this.name, this.ID); }
+Application.prototype.quit = function() {
+	return quitApp(window.App.name, window.App.ID);
+}
 
 /* Frames */
 
@@ -81,6 +83,12 @@ Application.prototype.getDirectoryInformations = function(path) { return Storage
 Application.prototype.dialog = new function() {};
 
 Application.prototype.dialog.alert = function(msg) { return Dialogs.alert(msg); }
+
+Application.prototype.dialog.info = function(msg) { return Dialogs.info(msg); }
+
+Application.prototype.dialog.warning = function(msg) { return Dialogs.warning(msg); }
+
+Application.prototype.dialog.error = function(msg) { return Dialogs.error(msg); }
 
 Application.prototype.dialog.confirm = function(msg) { return Dialogs.confirm(msg); }
 

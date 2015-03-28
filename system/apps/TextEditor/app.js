@@ -31,7 +31,7 @@ function openFile() {
 			if(!openFileCallback(file))
 				Dialogs.error('Text Editor', 'Cannot open ' + file + '. Please check that this file exists and is readable.');
 			else
-				Dialogs.alert('Text Editor', 'Sucessfull !');
+				Dialogs.info('Text Editor', 'Sucessfull !');
 
 		});
 
@@ -69,7 +69,14 @@ function saveFile() {
 
 function saveAsFile() {
 
-	alert('Save as...');
+	Dialogs.input('Text Editor - Save As...', 'Please input the file path :', 'text', function(path) {
+
+		file = path;
+		name = file.split('/')[file.split('/').length - 1];
+
+		saveFile();
+
+	});
 
 }
 
@@ -85,13 +92,16 @@ App.loadFrame('UI');
 $('#editor').on('keydown', function(e) {
 
 	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'O')
-		openFile();
+		return openFile();
+
+	if(e.ctrlKey && e.shiftKey && String.fromCharCode(e.keyCode) === 'S')
+		return saveAsFile();
 
 	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'S')
-		saveFile();
+		return saveFile();
 
 	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'Q')
-		App.events.on('quit')();
+		return App.events.on('quit')();
 
 });
 

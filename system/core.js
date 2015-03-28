@@ -15,7 +15,12 @@ var Core = window.Core = new function() {
 
 	this.crypto = new function() {
 
-		var _r = require;
+		var _fs = require('fs');
+		var _cr = require('crypto');
+
+		this.getSignPublicKey = function() {
+			return _fs.readFileSync(Core.path.root + '/system/sign/RSA-public-4096.pem', 'utf8');
+		}
 		
 		/**
 	      * Hash a string with SHA384 algorithm
@@ -25,7 +30,7 @@ var Core = window.Core = new function() {
 
 		this.hash = function(str) {
 
-			return _r('crypto').createHash('sha384').update(str).digest('hex');
+			return _cr.createHash('sha384').update(str).digest('hex');
 
 		}
 
@@ -46,7 +51,7 @@ var Core = window.Core = new function() {
 			if(typeof(keylen) !== 'number')
 				var keylen = 48;
 
-			return _r('crypto').pbkdf2Sync(pass, salt, iterations, keylen).toString('hex');
+			return _cr.pbkdf2Sync(pass, salt, iterations, keylen).toString('hex');
 
 		}
 
@@ -67,7 +72,7 @@ var Core = window.Core = new function() {
 			if(typeof(algo) !== 'string')
 				var algo = 'RSA-SHA384';
 
-			var c = _r('crypto').createSign(algo);
+			var c = _cr.createSign(algo);
 			c.update(data);
 			return c.sign(priv, output);
 
@@ -91,7 +96,7 @@ var Core = window.Core = new function() {
 			if(typeof(algo) !== 'string')
 				var algo = 'RSA-SHA384';
 
-			var v = _r('crypto').createVerify(algo);
+			var v = _cr.createVerify(algo);
 			v.update(bef);
 
 			return v.verify(pub, sign, input);
@@ -245,13 +250,13 @@ var Core = window.Core = new function() {
 			if(package.rights === 'herit')
 				package.rights = parseInt(Core.vars.get('rights'));
 
-			if(package.rights !== 1 && package.rights !== 2 && package.rights !== 3 && package.rights !== 3)
+			if(package.rights !== 1 && package.rights !== 2 && package.rights !== 3 && package.rights !== 4)
 				return Dialogs.error('Application launcher', 'This application require invalid rights ' + package.rights);
 
 			if(package.rights === 4 && !directory.match(/^\/system\/apps\//))
 				return Dialogs.error('Application launcher', 'This application require system rights, but only the system applications can have system rights.');
 
-			if(package.rights > Core.vars.get('rights'))
+			if(package.rights > Core.vars.get('rights') && package.rights !== 4)
 				return Dialogs.error('Application launcher', 'This application require a rights level that is superior to the user rights.<br />Please connect to an admin session to launch this application. ');
 
 			if(package.rights >= 3 && typeof(adminPass) === 'undefined') {
