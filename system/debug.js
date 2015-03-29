@@ -8,7 +8,11 @@ var Debug = new function() {
 
 	this.log = function(msg) {
 
-		var args = arguments;
+		var args = [];
+
+		for(var i in arguments)
+			args.push(arguments[i]);
+
 		args.splice(0, 1);
 
 		_logs.push({
@@ -21,7 +25,11 @@ var Debug = new function() {
 
 	this.warn = function(msg) {
 
-		var args = arguments;
+		var args = [];
+
+		for(var i in arguments)
+			args.push(arguments[i]);
+
 		args.splice(0, 1);
 
 		_warns.push({
@@ -34,7 +42,10 @@ var Debug = new function() {
 
 	this.error = function(msg) {
 
-		var args = arguments;
+		var args = [];
+
+		for(var i in arguments)
+			args.push(arguments[i]);
 
 		args.splice(0, 1);
 
@@ -48,7 +59,11 @@ var Debug = new function() {
 
 	this.info = function(msg) {
 
-		var args = arguments;
+		var args = [];
+
+		for(var i in arguments)
+			args.push(arguments[i]);
+
 		args.splice(0, 1);
 
 		_infos.push({

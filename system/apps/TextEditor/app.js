@@ -103,6 +103,34 @@ $('#editor').on('keydown', function(e) {
 	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'Q')
 		return App.events.on('quit')();
 
+	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'N')
+		Dialogs.dialog('Save changes ?', 'The file ' + file + ' has been edited.<br />Do you want to save it ?<br />Note : All not saved modifications will be definitively lost.', {
+
+			'Save': function() {
+				saveFile();
+				$('#editor').val('');
+				name = null;
+				file = null;
+				changes = false;
+				WinGUI.setTitle('Text Editor');
+				Dialogs.close();
+			},
+
+			'Do not save': function() {
+				$('#editor').val('');
+				name = null;
+				file = null;
+				changes = false;
+				WinGUI.setTitle('Text Editor');
+				Dialogs.close();
+			},
+
+			'Cancel': function() {
+				Dialogs.close();
+			}
+
+		});
+
 });
 
 $('#editor').on('input', function() {

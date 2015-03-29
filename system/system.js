@@ -46,7 +46,7 @@ var System = window.System = {
 		if(Core.path.included(path, '/users/$USER$/*'))
 			return 2;
 
-		if(!Core.path.included(path, '/system/*'))
+		if(!Core.path.included(path, '/system/*') && !Core.path.included(path, '/node-webkit/*'))
 			return 3;
 
 		return 4;
