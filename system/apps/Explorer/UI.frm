@@ -56,7 +56,10 @@ function loadPath(path) {
 	var items = App.readDir(path);
 
 	if(!items) {
-		Dialogs.error('Explorer - Open failed', 'Unable to open ' + path.replace(Core.path.root, '') + '.');
+		if(App.lastStack(-1))
+			Dialogs.error('Explorer - Open failed', 'Unable to open ' + path.replace(Core.path.root, '') + ' because that\'s needs privileges elevation.')
+		else
+			Dialogs.error('Explorer - Open failed', 'Unable to open ' + path.replace(Core.path.root, '') + '.');
 		return false;
 	}
 
@@ -159,6 +162,7 @@ if(!App.directoryExists('{{ PATH }}')) {
 	left: 150px;
 	right: 0;
 	bottom: 0;
+	overflow: auto;
 
 	padding: 5px;
 

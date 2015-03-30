@@ -32,13 +32,15 @@ var System = window.System = {
 
 	},
 
-	requireRights: function(path) {
+	requireRights: function(path, isRead) {
 
-		var rf = Registry.read('system/storage/readable');
+		if(isRead) {
+			var rf = Registry.read('system/storage/readable');
 
-		for(var i in rf)
-			if(Core.path.included(path, rf[i]))
-				return 1;
+			for(var i in rf)
+				if(Core.path.included(path, rf[i]))
+					return 1;
+		}
 
 		if(Core.path.included(path, '/users/$USER$/appdata/$APP_NAME$/*'))
 			return 1;
@@ -46,7 +48,7 @@ var System = window.System = {
 		if(Core.path.included(path, '/users/$USER$/*'))
 			return 2;
 
-		if(!Core.path.included(path, '/system/*') && !Core.path.included(path, '/node-webkit/*'))
+		if(!Core.path.included(path, '/system/*') && !Core.path.included(path, '/node-webkit/*') && !Core.path.included(path, '/external_tools/*'))
 			return 3;
 
 		return 4;

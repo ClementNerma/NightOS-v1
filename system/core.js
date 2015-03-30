@@ -278,9 +278,9 @@ var Core = window.Core = new function() {
 
 		if(typeof(appLauncher) === 'undefined')
 
-		this.launch = function(name, args, adminPass) {
+		this.launch = function(name, args, runAsAdmin, adminPass) {
 
-			if(typeof(adminPass) !== 'undefined' && adminPass !== null && !Core.users.isAdminPassword(adminPass) && !((adminPass == true || adminPass == 'true') && Core.users.isAdmin()))
+			if(typeof(adminPass) !== 'undefined' && adminPass !== true && !Core.isAdminPassword(adminPass))
 				return Dialogs.error('Application launcher', 'The password you entered is incorrect');
 
 			var App = window.App;
@@ -305,7 +305,7 @@ var Core = window.Core = new function() {
 			if(package.rights === 'herit')
 				package.rights = parseInt(Core.vars.get('rights'));
 
-			if(package.rights.substr(0, 6) === 'herit<') {
+			if(typeof(package.rights) === 'string' && package.rights.substr(0, 6) === 'herit<') {
 
 				var r = parseInt(Core.vars.get('rights'));
 
@@ -325,20 +325,23 @@ var Core = window.Core = new function() {
 			if(package.rights > Core.vars.get('rights') && package.rights !== 4)
 				return Dialogs.error('Application launcher', 'This application require a rights level that is superior to the user rights.<br />Please connect to an admin session to launch this application. ');
 
-			if(package.rights >= 3 && typeof(adminPass) === 'undefined') {
+			if(runAsAdmin || typeof(adminPass) !== 'undefined')
+				package.rights = 3;
+
+			if(package.rights >= 3 && ((typeof(adminPass) === 'undefined' && adminPass === true) || runAsAdmin)) {
 				window.toLaunchApp = name;
 				window.toLaunchAppArgs = args;
 
 				if(!Core.users.isAdmin())
 					return Dialogs.input('User account control', 'The ' + name + ' application require a rights level which require admin rights.<br />Please input the admin password :', 'password', function(pass) {
 
-						Core.applications.launch(window.toLaunchApp, window.toLaunchAppArgs, pass);
+						Core.applications.launch(window.toLaunchApp, window.toLaunchAppArgs, undefined, pass);
 
 					});
 				else
 					return Dialogs.confirm('User account control', 'The ' + name + ' application require a rights level which require admin rights.<br />Do you want to continue ?', function(pass) {
 
-						Core.applications.launch(window.toLaunchApp, window.toLaunchAppArgs, true);
+						Core.applications.launch(window.toLaunchApp, window.toLaunchAppArgs, undefined, true);
 
 					});
 			}
@@ -739,6 +742,12 @@ var Core = window.Core = new function() {
 						con.write('Successfully changed path.');
 				else
 					con.write('/' + path.relative(Core.path.root, process.cwd()));
+
+			},
+
+			debug: function(args, con) {
+
+				con.write('Rights : ' + App.getCertificate().getRights());
 
 			},
 

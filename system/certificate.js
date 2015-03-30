@@ -83,9 +83,9 @@ Certificate.prototype.hasPermission = function(name) {
  * @returns {Boolean}
  */
 
-Certificate.prototype.hasAccess = function(path) {
+Certificate.prototype.hasAccess = function(path, isRead) {
 
-	if(System.requireRights(path) > this.rights)
+	if(System.requireRights(path, isRead) > this.rights)
 		return false;
 
 	for(var i in this.access)

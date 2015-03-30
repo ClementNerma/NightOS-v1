@@ -10,7 +10,7 @@ var Storage = window.Storage = new function() {
 	var appDirectory = directory;
 	var watchdir     = require('./external_tools/watchdir.js');
 
-	function authorize(funcName, ignorePath) {
+	function authorize(funcName, ignorePath, acceptReadableFolders) {
 
 		var args = Core.backtrace.getCaller().arguments;
 
@@ -20,14 +20,7 @@ var Storage = window.Storage = new function() {
 
 		var path = Core.path.format(args[1]);
 
-		var isReadableSystemFolder = false;
-		var rf = Registry.read('system/storage/readable');
-
-		for(var i in rf)
-			if(Core.path.included(path, rf[i]))
-				isReadableSystemFolder = true;
-
-		if((!args[0].hasAccess(path) && !ignorePath && !isReadableSystemFolder) || !args[0].hasPermission(['storage', funcName.replace(/([a-z])([A-Z])/g, function(a, b, c) { return b + '_' + c.toLowerCase(); })]))
+		if((!args[0].hasAccess(path, acceptReadableFolders) && !ignorePath) || !args[0].hasPermission(['storage', funcName.replace(/([a-z])([A-Z])/g, function(a, b, c) { return b + '_' + c.toLowerCase(); })]))
 			return Debug.error(System.errors.NOPERM);
 			//console.log(path);
 
@@ -133,7 +126,7 @@ var Storage = window.Storage = new function() {
 
 		App.pushStack(0);
 
-		var path = authorize('readFile');
+		var path = authorize('readFile', undefined, true);
 		
 		if(!path) {
 			App.pushStack(-1);

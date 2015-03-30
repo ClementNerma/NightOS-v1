@@ -206,6 +206,8 @@ var Explorer = window.Explorer = new function() {
 
  	 this.open = function(path, file, runAsAdmin) {
 
+ 	 	//console.log(path, file, runAsAdmin);
+
  	 	if(path.substr(0, 4) === 'app:')
  	 		return Core.applications.launch(path.substr(4), {
  	 			origin: 'System'
