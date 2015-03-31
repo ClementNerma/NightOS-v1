@@ -8,7 +8,7 @@ var Storage = window.Storage = new function() {
 
 	var fs = require('fs');
 	var appDirectory = directory;
-	var watchdir     = require('./external_tools/watchdir.js');
+	var watchdir     = require(Core.path.root + '/external-tools/watchdir.js');
 
 	function authorize(funcName, ignorePath, acceptReadableFolders) {
 

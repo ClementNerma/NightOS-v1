@@ -88,7 +88,7 @@
 
 		"storage": {
 
-			"readable": ["/system/boot_frames/", "/system/apps/"]
+			"readable": ["/system/boot/", "/system/apps/"]
 
 		}
 

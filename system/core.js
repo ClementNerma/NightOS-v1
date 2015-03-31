@@ -366,7 +366,7 @@ var Core = window.Core = new function() {
 
 			Object.freeze(win);
 
-			var frame = $(document.createElement('iframe')).attr('sandbox', 'allow-scripts').attr('nwfaketop', true).attr('src', 'system/app-launcher/launcher.html').attr('app', name).attr('app-id', id);
+			var frame = $(document.createElement('iframe')).attr('sandbox', 'allow-scripts').attr('nwfaketop', true).attr('src', Core.path.format('/system/app-launcher/launcher.html')).attr('app', name).attr('app-id', id);
 
 			$('#app-' + name + '-' + id + ' .content:first').append(frame);
 
@@ -856,7 +856,7 @@ var Core = window.Core = new function() {
 
 		try {
 			var styles = fs.readdirSync(Core.path.root + '/system/styles');
-			styles.push('../../external_tools/font-awesome.css');
+			styles.push('../../external-tools/font-awesome.css');
 
 			if(applicationLauncher)
 				styles.push('../app-launcher/main.css');
@@ -882,11 +882,11 @@ var Core = window.Core = new function() {
 			return true;
 
 		try {
-			var UI = fs.readFileSync(Core.path.root + '/system/boot_frames/app.js', 'utf8');
+			var UI = fs.readFileSync(Core.path.root + '/system/boot/app.js', 'utf8');
 		}
 
 		catch(e) {
-			throw new Error('Unable to load UI [system/boot_frames/app.js]. Make sure that this directory is readable.<br /><br />' + e.message);
+			throw new Error('Unable to load UI [system/boot/app.js]. Make sure that this directory is readable.<br /><br />' + e.message);
 		}
 
 		try {
@@ -899,7 +899,7 @@ var Core = window.Core = new function() {
 		}
 
 		catch(e) {
-			throw new Error('An error occured during loading UI [system/boot_frames/app.js].<br /><br />' + e.message);
+			throw new Error('An error occured during loading UI [system/boot/app.js].<br /><br />' + e.message);
 		}
 	}
 
