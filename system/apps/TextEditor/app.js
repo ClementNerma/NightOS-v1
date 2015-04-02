@@ -41,7 +41,7 @@ function openFileCallback(path) {
 
 	var content = App.readFile(path);
 
-	if(!content)
+	if(content === false)
 		return false;
 
 	file = path;
@@ -60,7 +60,7 @@ function saveFile() {
 		return true;
 
 	if(file) {
-		changes = !App.writeFile(file, $('#editor').val()) ? true : Dialogs.error('Cannot save ' + file + '.');
+		changes = App.writeFile(file, $('#editor').val()) ? true : Dialogs.error('Cannot save ' + file + '.');
 		return changes;
 	} else
 		return saveAsFile();

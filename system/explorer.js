@@ -245,9 +245,15 @@ var Explorer = window.Explorer = new function() {
  	 	if(!app)
 	 		app = Registry.read('filesys/unknown/open');
 
+	 	console.log(app);
+
 	 	if(app.substr(0, 4) === 'sys:')
- 	 		if(typeof(eval(app.substr(4))) === 'function')
-				return eval(app.substr(4))(path);
+ 	 		if(typeof(Explorer.FileSystem[app.substr(4)]) === 'function') {
+ 	 			//console.log('open : ' + app.substr(4), file);
+				return Explorer.FileSystem[app.substr(4)](file, file);
+			}
+			else
+				return Dialogs.error('File opener - Open failed', 'Cannot find system function : ' + app.substr(4))
 
 	 	if(app === App.name)
 	 		return App.events.on('explorerOpen')(app, {
