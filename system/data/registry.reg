@@ -88,8 +88,19 @@
 
 		"storage": {
 
-			"readable": ["/system/boot/", "/system/apps/"]
+			"readable": ["/system/boot/", "/system/apps/", "/apps/"]
 
+		}
+
+	},
+
+	"commands": {
+
+		"alias": {
+			"Explorer": [],
+			"TextEditor": ["textedit", "edit"],
+			"Updater": [],
+			"SDK": ["make"]
 		}
 
 	}

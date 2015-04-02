@@ -3,7 +3,7 @@ $('body').append(terminal);
 
 App.loadFrame('style');
 
-$('body').append($(document.createElement('textarea')).attr('id', 'terminal'));
+$('body').append($(document.createElement('div')).attr('id', 'terminal'));
 
 var terminal = new Console($('#terminal'), false);
 

@@ -6,8 +6,8 @@
 var System = window.System = {
 
 	name: 'NightOS',
-	version: '1.0',
-	type: 'beta',
+	version: '0.1',
+	type: 'alpha',
 	developpers: ['Clement Nerma'],
 	thanksTo: [],
 
@@ -48,7 +48,7 @@ var System = window.System = {
 		if(Core.path.included(path, '/users/$USER$/*'))
 			return 2;
 
-		if(!Core.path.included(path, '/system/*') && !Core.path.included(path, '/node-webkit/*') && !Core.path.included(path, '/external-tools/*'))
+		if(!Core.path.included(path, '/system/*') && !Core.path.included(path, '/node-webkit/*') && !Core.path.included(path, '/external-tools/*') && !Core.path.included('/apps'))
 			return 3;
 
 		return 4;

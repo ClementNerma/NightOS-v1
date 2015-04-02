@@ -239,6 +239,22 @@ var Core = window.Core = new function() {
 
 			name = name.replace(/[^a-zA-Z0-9 _\-]/g, '');
 
+			var r = Registry.read('commands/alias');
+			var n = null;
+
+			for(var i in r) {
+				if(i.toUpperCase() == name.toUpperCase()) {
+					name = i;
+					break;
+				}
+				
+				for(var j in r[i])
+					if(r[i][j].toUpperCase() == name.toUpperCase()) {
+						name = i;
+						break;
+					}
+				}
+
 			if(App.directoryExists('/system/apps/' + name)) {
 				var directory = '/system/apps/' + name;
 				app.isSystem = true;
@@ -286,6 +302,16 @@ var Core = window.Core = new function() {
 			var App = window.App;
 
 			name = name.replace(/[^a-zA-Z0-9 _\-]/g, '');
+
+			var r = Registry.read('commands/alias');
+			var n = null;
+
+			for(var i in r)
+				for(var j in r[i])
+					if(r[i][j].toUpperCase() == name.toUpperCase()) {
+						name = i;
+						break;
+					}
 
 			if(App.directoryExists('/system/apps/' + name))
 				var directory = '/system/apps/' + name;
@@ -567,10 +593,19 @@ var Core = window.Core = new function() {
 		this.chdir = this.cd = function(path) {
 
 			if(typeof(path) === 'undefined')
-				return process.cwd();
-			else if(App.directoryExists(path))
-				return process.chdir(this.format(path));
-			else
+				return process.cwd().replace(this.root, '');
+			else if(App.directoryExists(path)) {
+
+				try {
+					process.chdir(this.format(path));
+					return true;
+				}
+
+				catch(e) {
+					return false;
+				}
+
+			} else
 				return false;
 
 		}
@@ -779,7 +814,18 @@ var Core = window.Core = new function() {
 			if(!(con instanceof Console))
 				var con = new Console($(document.createElement('textarea')));
 
-			var args = cmd.replace(/ "(.*?)"/g, "\n$1").split("\n");
+			var cmds = cmd.split('&&');
+
+			// && chars doesn't works, correct that !
+
+			if(cmds.length > 1) {
+				for(var i in cmds)
+					this.exec(cmds[i], con)
+
+				return;
+			}
+
+			var args = cmd.trim().replace(/ "(.*?)"/g, "\n$1").split("\n");
 			var n = args[0];
 
 			args.splice(0, 1);
@@ -791,11 +837,11 @@ var Core = window.Core = new function() {
 			
 			if(typeof(native[cmd_name]) !== 'function') {
 
-				console.log('will get app');
+				//console.log('will get app');
 
 				var app = Core.applications.get(cmd_name);
 
-				console.log('end get');
+				//console.log('end get');
 
 				if(app) {
 					window.nextcmd = app;
@@ -1002,7 +1048,7 @@ window.backtrace    = Core.backtrace
 window.path         = Core.path
 window.frames       = Core.frames
 window.vars         = Core.vars;
-window.crypto   = Core.crypto;
+window.crypto       = Core.crypto;
 
 var APP_NAME        = (typeof(app_name) === 'undefined') ? 'System' : app_name;
 Core.vars.set('APP_NAME', APP_NAME);

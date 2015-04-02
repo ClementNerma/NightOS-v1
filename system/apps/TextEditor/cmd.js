@@ -1,6 +1,6 @@
 
 Core.applications.launch('TextEditor', {
-	openFile: openFile,
+	openFile: args[0],
 	origin: 'CommandLine',
 	from: App.name
 });
