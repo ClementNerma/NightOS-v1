@@ -60,9 +60,9 @@ function saveFile() {
 		return true;
 
 	if(file) {
-		changes = App.writeFile(file, $('#editor').val()) ? true : Dialogs.error('Cannot save ' + file + '.');
+		changes = App.writeFile(file, $('#editor').val()) ? true : Dialogs.error('Text Editor', 'Cannot save ' + file + '.');
 		return changes;
-	} else
+ 	} else
 		return saveAsFile();
 
 }

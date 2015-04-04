@@ -8,7 +8,7 @@ if(!App.call.arguments.openFile)
 else {
 	var updater = App.readFile(App.call.arguments.openFile);
 
-	if(!updater)
+	if(updater === false)
 		err('Cannot read the specified file.');
 	else {
 

@@ -103,7 +103,7 @@ var Core = window.Core = new function() {
 		this.verify = function(sign, bef, pub, input, algo) {
 
 			if(typeof(input) !== 'string')
-				var input = 'hex';;
+				var input = 'hex';
 
 			if(typeof(algo) !== 'string')
 				var algo = 'RSA-SHA384';
@@ -409,6 +409,12 @@ var Core = window.Core = new function() {
 
 				}
 
+				this.contentWindow.installPackageApp = function(package, con) {
+
+					return Core.applications.installFromPackage(package, con);
+
+				}
+
 				this.contentWindow.quitApp = function(name, frame_ID) {
 
 					return Core.applications.close(name, frame_ID);
@@ -494,6 +500,199 @@ var Core = window.Core = new function() {
 				return Dialogs.error('Application package', 'Cannot find application : ' + name);
 			
 			return JSON.parse(App.readFile(directory + '/package.prm'));
+
+		}
+
+		/**
+		  * Know if an application is installed on the computer
+		  * @param {string} name Application name
+		  * @return {Boolean}
+		  */
+
+		this.exists = function(name) {
+
+			return (App.directoryExists('/system/apps/' + name) || App.directoryExists('/apps/' + name));
+
+		}
+
+		/**
+		  * Check if an application name is valid
+		  * @param {string} name Application name
+		  * @return {Boolean}
+		*/
+
+		this.isValidName = function(name) {
+
+			return (name.replace(/[^a-zA-Z0-9 _\-]/g, '') === name);
+
+		}
+
+		/**
+		  * Check if an application package is valid
+		  * @param {string|Object} package Application package (JSON string or JSON object)
+		  * @return {Boolean}
+		  */
+
+		this.isValidPackage = function(package) {
+
+			if(typeof(package) !== 'object') {
+				try {
+					package = JSON.parse(package);
+				}
+
+				catch(e) {
+					return Debug.error('Invalid JSON package');
+				}
+			}
+
+			var check = ['name', 'creator', 'version', 'icon', 'access', 'permissions', 'rights', 'files'];
+
+			for(var i in check)
+				if(typeof(package[check[i]]) === 'undefined')
+					return Debug.error('Missing required entries [' + check[i] + ']');
+
+			if(typeof(package.permissions) !== 'object' || typeof(package.rights) !== 'number' || typeof(package.access) !== 'object' || typeof(package.files) !== 'object')
+				return Debug.error('Invalid entries format');
+
+			if(package.rights != 1 && package.rights != 2 && package.rights != 3 && package.rights != 4)
+				return Debug.error('Invalid rights [' + package['rights'] + ']');
+
+			for(var i in files)
+				if(!this.isValidName(i))
+					return Debug.error('Invalid file name [' + i + ']');
+
+			if(!this.isValidName(package.name))
+				return Debug.error('Not a valid name [' + package.name + ']');
+
+			return true;
+
+		}
+
+		/**
+		  * Check if an application package is correctly signed
+		  * @param {string|Object} package Application package (JSON string or JSON object)
+		  * @return {Boolean}
+		  */
+
+		this.isSignedPackage = function(package) {
+
+			if(!this.isValidPackage(package))
+				return Debug.error('Not a valid application package');
+
+			if(typeof(package) !== 'object')
+				package = JSON.parse(package);
+
+			if(typeof(package.sign) !== 'object')
+				return Debug.error('The application package isn\'t signed');
+
+			var sign = package.sign;
+			delete package.sign;
+
+			check = ['signed', 'input', 'algorithm'];
+
+			for(var i in check)
+				if(!sign[check[i]])
+					return Debug.error('The application package sign object doesn\'t contains the required fields [' + check[i].escapeHTML() + ']');
+
+			return Core.crypto.sign(sign.signed, JSON.stringify(package), Core.crypto.getSignPublicKey(), sign.input, sign.algorithm);
+
+		}
+
+		/**
+		  * Install an application from a package
+		  * @param {Object} package Application package
+		  * @param {Object} con [Optionnal] The output debug console
+		  * @return {Boolean} Return true if the installation success
+		  */
+
+		if(typeof(appLauncher) === 'undefined')
+
+		this.installFromPackage = function(package, con) {
+
+			var out = (con || Debug);
+
+			out.write('Checking application package...');
+
+			if(!this.isValidPackage(package))
+				return out.error('Invalid application package');
+
+			if(typeof(package) !== 'object')
+				package = JSON.parse(package);
+
+			var o_p = package;
+
+			var s = this.isSignedPackage(package);
+
+			if(!s)
+				out.warn('The application package is not signed. This can cause security issues');
+
+			if(package.rights == 4 && !System.rooted)
+				return out.error('Can\'t install the application because it require system rights and your system is not rooted');
+
+			if(this.exists(package.name))
+				return out.error('An application which this name [' + package.name.escapeHTML() + '] alreay exists on this computer');
+
+			var dir = ((package.rights == 4) ? '/system' : '') + '/apps/' + package.name + '/';
+
+			if(!App.makeDir(dir))
+				return out.error('Can\'t make the application directory [' + dir + ']');
+
+			out.write('Writing applications files...');
+
+			for(var i in package.files) {
+
+				out.write('| Writing ' + i.escapeHTML() + '...', true);
+
+				if(!App.writeFile(dir + i, package.files[i])) {
+					App.removeDir(dir);
+					return out.error('Can\'t write an application file [' + i + ']');
+				}
+
+				out.write(' - Successfull');
+
+			}
+
+			delete package.files;
+
+			out.write('| Writing package.prm...', true);
+
+			if(!App.writeFile(dir + 'package.prm', JSON.stringify(package))) {
+				App.removeDir(dir);
+				return out.error('Can\'t write the application package [package.prm]');
+			}
+
+			out.write(' - Successfull');
+
+			out.write('Writing registry...');
+
+			var d = new Date();
+
+			Registry.write('applications/' + name, {
+
+				installed: {
+					str: d.toString(),
+					day: d.getDay(),
+					month: d.getMonth(),
+					year: d.getFullYear()
+				},
+
+				package: o_p
+
+
+			});
+
+			out.write('The application has been sucessfully installed !');
+
+			return true;
+
+		}
+
+		else
+
+		this.installFromPackage = function(package, con) {
+
+			return installPackageApp(package, con);
+
 		}
 
 	}
@@ -592,9 +791,10 @@ var Core = window.Core = new function() {
 
 		this.chdir = this.cd = function(path) {
 
-			if(typeof(path) === 'undefined')
-				return process.cwd().replace(this.root, '');
-			else if(App.directoryExists(path)) {
+			if(typeof(path) === 'undefined') {
+				var c = process.cwd().replace(this.root, '');
+				return c ? c : '/';
+			} else if(App.directoryExists(path)) {
 
 				try {
 					process.chdir(this.format(path));
@@ -616,6 +816,12 @@ var Core = window.Core = new function() {
 		  */
 
 		this.format = function(path, formatSelectors, disableVariables) {
+
+			// correct the next bug :
+			// when chdir in /users/admin/documents/App
+			// and format '../..'
+			// relative result is : '/' insteadof '/users/admin'
+
 
 			if(path.replace(this.root, '') === '/*' && formatSelectors)
 				return new RegExp(this.root.formatToRegex() + '($|\/(.*))')
@@ -825,6 +1031,8 @@ var Core = window.Core = new function() {
 				return;
 			}
 
+			con.noinvite();
+
 			var args = cmd.trim().replace(/ "(.*?)"/g, "\n$1").split("\n");
 			var n = args[0];
 
@@ -835,13 +1043,26 @@ var Core = window.Core = new function() {
 			
 			args.splice(0, 1);
 			
+			var alias = Registry.read('commands/alias');
+
+			if(typeof(native[cmd_name]) !== 'function')
+				for(var i in alias) {
+
+					if(i.toUpperCase() == cmd_name.toUpperCase()) {
+						cmd_name = i;
+						break;
+					}
+
+					for(var j in alias[i])
+						if(alias[i][j].toUpperCase() == cmd_name.toUpperCase()) {
+							cmd_name = i;
+							break;
+						}
+					}
+
 			if(typeof(native[cmd_name]) !== 'function') {
 
-				//console.log('will get app');
-
 				var app = Core.applications.get(cmd_name);
-
-				//console.log('end get');
 
 				if(app) {
 					window.nextcmd = app;
@@ -855,10 +1076,14 @@ var Core = window.Core = new function() {
 					else
 						new Function(['con', 'args'], app.commandLine)(window.nextcon, args);
 
- 				} else
+ 				} else {
 					con.error('Command not found : ' + cmd_name);
-			} else
+					con.invite();
+				}
+			} else {
 				native[cmd_name](args, con);
+				con.invite();
+			}
 
 		}
 

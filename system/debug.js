@@ -6,7 +6,7 @@ var Debug = new function() {
 	var _errors = [];
 	var _infos  = [];
 
-	this.log = function(msg) {
+	this.log = this.write = function(msg) {
 
 		var args = [];
 
@@ -54,6 +54,10 @@ var Debug = new function() {
 			msg: msg,
 			args: args
 		});
+
+		console.error(msg);
+
+		return false;
 
 	}
 

@@ -58,9 +58,8 @@ var Console = function(context, setDefaultInvite) {
 			var cmd = _console.lastChild.innerText;
 			_console.lastChild.setAttribute('contenteditable', false);
 
-			this.noinvite();
-
 			if(!cmd) {
+				this.noinvite();
 				this.invite();
 				return false;
 			}
@@ -68,7 +67,6 @@ var Console = function(context, setDefaultInvite) {
 			_history.push(cmd);
 			_h = _history.length;
 			Core.commandLine.exec(cmd, this);
-			this.invite();
 
 			return false;
 
@@ -91,6 +89,7 @@ var Console = function(context, setDefaultInvite) {
 	this.error = function(text, noJump) {
 
 		_console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: red;">' + text + '</span>';
+		return false;
 
 	}
 

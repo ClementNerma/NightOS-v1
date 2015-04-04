@@ -9,7 +9,6 @@
 var Registry = window.Registry = new function() {
 
 	var _reg = null;
-	var _isAppLauncher = (typeof(appLauncher) !== 'undefined');
 
 	/**
 	  * Load the registry
@@ -55,8 +54,8 @@ var Registry = window.Registry = new function() {
 
 	this.write = function(path, value) {
 
-		if(_isAppLauncher)
-			throw new Error('The applications cannot write the system registry.')
+		if(App.getCertificate().getRights() < 4)
+			throw new Error('Only system applications are allowed to write the system registry.')
 
 		try {
 			eval('_reg["' + path.replace(/[^a-zA-Z0-9\/\-_]/g, '').replace(/\//g, '"]["') + '"] = ' + val2str(value));

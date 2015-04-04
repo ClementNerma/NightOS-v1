@@ -1,0 +1,1 @@
+con.write('Hello world !');

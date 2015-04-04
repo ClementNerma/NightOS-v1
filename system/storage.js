@@ -419,7 +419,7 @@ var Storage = window.Storage = new function() {
 
 		App.pushStack(0);
 
-		var path = authorize('readDir');
+		var path = authorize('readDir', undefined, true);
 
 		if(!path) {
 			App.pushStack(-1);
@@ -483,7 +483,7 @@ var Storage = window.Storage = new function() {
 
 		App.pushStack(0);
 
-		var path = authorize('readSubDirs');
+		var path = authorize('readSubDirs', undefined, true);
 
 		if(!path) {
 			App.pushStack(-1);

@@ -63,14 +63,14 @@ if(!uninstaller)
 	con.warn('No uninstaller found, the system will use the default uninstaller.');
 
 p.files = {
-	app: app.replace(/\\/g, '\\\\').replace(/\n|\r/g, '\\n')
+	"app.js": app.replace(/\\/g, '\\\\').replace(/\n|\r/g, '\\n')
 }
 
 if(cmd)
-	p.files.cmd = cmd.replace(/\\/g, '\\\\').replace(/\n|\r/g, '\\n');
+	p.files["cmd.js"] = cmd.replace(/\\/g, '\\\\').replace(/\n|\r/g, '\\n');
 
 if(uninstaller)
-	p.files.uninstaller = uninstaller.replace(/\\/g, '\\\\').replace(/\n|\r/g, '\n');
+	p.files["uninstaler.js"] = uninstaller.replace(/\\/g, '\\\\').replace(/\n|\r/g, '\n');
 
 if(!App.writeFile(args[1], JSON.stringify(p)))
 	return con.error('Application has been packed but cannot write in the output file [' + args[1] + ']');

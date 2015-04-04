@@ -9,7 +9,8 @@ var System = window.System = {
 	version: '0.1',
 	type: 'alpha',
 	developpers: ['Clement Nerma'],
-	thanksTo: [],
+	thanksTo: ['motezazer'],
+	rooted: false,
 
 	defaultCharset: 'utf8',
 
@@ -48,7 +49,7 @@ var System = window.System = {
 		if(Core.path.included(path, '/users/$USER$/*'))
 			return 2;
 
-		if(!Core.path.included(path, '/system/*') && !Core.path.included(path, '/node-webkit/*') && !Core.path.included(path, '/external-tools/*') && !Core.path.included('/apps'))
+		if(!Core.path.included(path, '/system/*') && !Core.path.included(path, '/node-webkit/*') && !Core.path.included(path, '/external-tools/*') && !Core.path.included(path, '/apps/*'))
 			return 3;
 
 		return 4;
