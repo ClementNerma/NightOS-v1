@@ -72,6 +72,10 @@ Application.prototype.directoryExists = function(path) { return Storage.director
 
 Application.prototype.exists = function(path) { return Storage.exists(path); }
 
+Application.prototype.getFileInformations = function(path) { return Storage.getFileInformations(this.certificate, path); }
+
+Application.prototype.getFileSize = function(path) { return Storage.getFileSize(this.certificate, path); }
+
 /* Storage informations */
 
 Application.prototype.getFileInformations = function(path) { return Storage.getFileInformations(this.certificate, path); }

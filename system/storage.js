@@ -325,22 +325,48 @@ var Storage = window.Storage = new function() {
 			return false;
 		}
 
-		if(!this.fileExists(directory))
-			return false;
+		if(!this.fileExists(path))
+			return Debug.error('File not found [' + path + ']');
 			//throw new Error('The path doesn\'t exists [' + path + ']');
 
 		try {
 			var ext = Explorer.fileExtension(path);
 			
-			var inf = fs.stats(path);
+			var inf = fs.statSync(path);
 			inf.opener = ( Registry.read('filesys/' + ext + '/open') || Registry.read('filesys/unknown/open') );
 			inf.type   = ( Registry.read('filesys/' + ext + '/type') || Registry.read('filesys/unknown/type') );
-		
+
 			return inf;
 		}
 
 		catch(e) {
+			return Debug.error('Internal error | ' + new String(e));
+		}
+
+	}
+
+	this.getFileSize = function(_cert, directory) {
+
+		App.pushStack(0);
+
+		var path = authorize('getFileSize');
+
+		if(!path) {
+			App.pushStack(-1);
 			return false;
+		}
+
+		if(!this.fileExists(path))
+			return Debug.error('File not found [' + path + ']');
+			//throw new Error('The path doesn\'t exists [' + path + ']');
+
+		try {
+			var inf = fs.statSync(path);
+			return inf.size;
+		}
+
+		catch(e) {
+			return Debug.error('Internal error | ' + new String(e));
 		}
 
 	}

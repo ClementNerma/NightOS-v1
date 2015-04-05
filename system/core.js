@@ -789,10 +789,16 @@ var Core = window.Core = new function() {
 
 		var r_path = require('path');
 
+		/**
+		  * Get the current directory
+		  */
+
 		this.chdir = this.cd = function(path) {
 
-			if(typeof(path) === 'undefined') {
-				var c = process.cwd().replace(this.root, '');
+			if(typeof(path) === 'undefined' || path === true || path === false) {
+				var c = process.cwd()
+				if(!path)
+					c = c.replace(this.root, '');
 				return c ? c : '/';
 			} else if(App.directoryExists(path)) {
 
@@ -815,13 +821,45 @@ var Core = window.Core = new function() {
 		  * @param {string} path (NightPath format)
 		  */
 
-		this.format = function(path, formatSelectors, disableVariables) {
+    	this.format = function(path, formatSelectors, disableVariables) {
+
+    		if(path.replace(this.root, '') === '/*' && formatSelectors)
+    			return new RegExp(this.root.formatToRegex() + '($|\/(.*))');
+
+    		var vars = Core.vars.vars();
+
+    		path = path.replace(/[^a-zA-Z0-9 \-_\.\/\?\*\$]/g, '');
+    		path = path.replace(Core.path.root, '');
+
+    		if(!disableVariables)
+				for(var i in vars)
+					path = path.replace(new RegExp('\\$' + i + '\\$', 'gi'), vars[i]);
+
+    		if(!formatSelectors)
+    			path = path.replace(/\*/g, '').replace(/\?/g, '');
+
+    		path = (path.substr(0, 1) === '/' ? Core.path.root : Core.path.chdir(true)) + '/' + r_path.normalize(path);
+    		path = r_path.normalize(path);
+
+    		if(path.substr(0, Core.path.root.length) !== Core.path.root)
+    			path = Core.path.root;
+
+			if(formatSelectors)
+				path = new RegExp(path.replace(/\/(|\*)$/, '').formatToRegex() + '($|\/\\*)'
+					.replace(/\\\*/g, '([a-zA-Z0-9 _\\-\\/]*)').replace(/\\\?/g, '.'));
+
+			return path;
+
+    	}
+
+		// delete this function !
+
+		/*this.old_format = function(path, formatSelectors, disableVariables) {
 
 			// correct the next bug :
 			// when chdir in /users/admin/documents/App
 			// and format '../..'
 			// relative result is : '/' insteadof '/users/admin'
-
 
 			if(path.replace(this.root, '') === '/*' && formatSelectors)
 				return new RegExp(this.root.formatToRegex() + '($|\/(.*))')
@@ -844,15 +882,17 @@ var Core = window.Core = new function() {
 
 			if(formatSelectors) {
 				regex = regex.replace(/\/(|\*)$/, '').formatToRegex() + '($|\/\\*)';
-				regex = regex.replace(/\\\*/g, '([a-zA-Z0-9 _\\-\\/]*)').replace(/\\\?/g, '.');
+				regex = regex.replace(/\\\*/
+					/*g, '([a-zA-Z0-9 _\\-\\/]*)').replace(/\\\?/g, '.');
 			} else
-				regex = regex.replace(/\*/g, '').replace(/\?/g, '');
+				regex = regex.replace(/\*/
+					/*g, '').replace(/\?/g, '');
 
 			regex = r_path.normalize(regex);
 
 			return formatSelectors ? new RegExp(regex, 'g') : regex;
 
-		}
+		}*/
 
 		/**
 		  * Know if a path is in a NightPath
@@ -890,7 +930,12 @@ var Core = window.Core = new function() {
 
 			echo: function(args, con) {
 
-				con.write(args.join(' '));
+				var txt = args.join(' ');
+
+				for(var i in vars)
+					path = path.replace(new RegExp('\\$' + i + '\\$', 'gi'), vars[i]);
+
+				
 
 			},
 
@@ -957,15 +1002,26 @@ var Core = window.Core = new function() {
 
 			},
 
-			lsdir: function(args, con) {
+			ls: function(args, con) {
 
-				if(!args[0])
-					args[0] = process.cwd();
+				if(args[0] === '-d' || args[0] === '--details') {
 
-				var f = App.readDir(args[0]);
+					var path = (args[1] || '.');
+					var f    = App.readDir(path);
+
+					html = '';
+
+					for(var i in f)
+						html += '<tr><td>' + (App.fileExists(f[i]) ? 'f' : 'd') + '</td><td>&nbsp;' + (App.fileExists(f[i]) ? App.getFileSize(path + '/' + f[i]) : '-') + '</td><td>&nbsp;' + f[i] + '</td></tr>';
+
+					return con.write('<table>' + html + '</table>');
+
+				}
+
+				var f = App.readDir((args[0] || '.'));
 
 				if(f)
-					con.write(f.join("\n"))
+					con.text(f.join("\n"))
 				else if(App.lastStack(-1))
 					con.error('Needs privileges elevation');
 				else
@@ -980,9 +1036,9 @@ var Core = window.Core = new function() {
 					if(!Core.path.chdir(args[0]))
 						con.error('An error has occured.');
 					else
-						con.write('Successfully changed path.');
+						con.text('Successfully changed path.');
 				else
-					con.write('/' + path.relative(Core.path.root, process.cwd()));
+					con.text('/' + path.relative(Core.path.root, process.cwd()));
 
 			},
 

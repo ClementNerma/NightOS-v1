@@ -80,6 +80,12 @@ var Console = function(context, setDefaultInvite) {
 
 	}
 
+	this.text = function(text, noJump) {
+
+		_console.innerHTML += (noJump ? '' : '<br />') + text.escapeHTML().replace(/\\n/g, '<br />').replace(/ /g, '&nbsp;');
+
+	}
+
 	this.warn = function(text, noJump) {
 
 		_console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: yellow;">' + text + '</span>';

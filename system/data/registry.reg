@@ -113,7 +113,8 @@
 			"mkdir": ["md"],
 			"rmdir": ["rd"],
 			"remove": ["rm"],
-			"chdir": ["cd"]
+			"chdir": ["cd"],
+			"ls": []
 		}
 
 	},
