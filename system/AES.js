@@ -1,24 +1,73 @@
 
 var AES = window.AES = {
-	encrypt: function(decrypted, key) {
-		return CryptoJS.AES.encrypt(decrypted, key);
+	encrypt: function(decrypted, key, iv, inputEncoding, outputEncoding) {
+		/*key and iv must be either binary encoded strings (deprecated) or buffers
+		inputEncoding must be either 'ascii', 'utf8', 'binary' or undefined
+		outputEncoding must be either 'base64', 'hex', 'binary' or undefined
+		when they are undefined, a buffer is expected */
+		
+		require('crypto');
+		
+		var cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+		
+		var encrypted = cipher.update(decrypted, inputEncoding, outputEncoding);
+		
+		cipher.final();
+		
+		return encrypted;
 	},
 
-	decrypt: function(decrypted, key, charset) {
-		return CryptoJS.AES.decrypt(decrypted, key).toString(CryptoJS.enc[charset]);
+	decrypt: function(encrypted, key, iv, inputEncoding, outputEncoding) {
+		/*key and iv must be either binary encoded strings (deprecated) or buffers
+		inputEncoding must be either 'ascii', 'utf8', 'binary' or undefined
+		outputEncoding must be either 'base64', 'hex', 'binary' or undefined
+		when they are undefined, a buffer is expected */
+		
+		require('crypto');
+		
+		var decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+		
+		var decrypted = decipher.update(decrypted, inputEncoding, outputEncoding);
+		
+		decipher.final();
+		
+		return decrypted;
 	},
 
 	generateKey: function(length) {
-		if(!length) length = 40;
+		/* length is in bits
+		This function returns a buffer */
+		
+		require('crypto');
+		
+		if(!length) length = 256;
 
-		var key = '';
-		var lt = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		var nb = '0123456789';
-
-		for(var i = 0; i < length; i++)
-			key += (Math.floor(Math.random() * 2)) ? lt.substr(Math.floor(Math.random() * 26), 1) : nb.substr(Math.floor(Math.random() * 10), 1);
+		try {
+			var key = crypto.randomBytes(length);
+		}
+		catch (e) {
+			return false;
+		}
 
 		return key;
+	}
+	
+	generateIV: function(length) {
+		/* length is in bits
+		This function returns a buffer */
+		
+		require('crypto');
+		
+		if(!length) length = 128;
+
+		try {
+			var IV = crypto.randomBytes(length);
+		}
+		catch (e) {
+			return false;
+		}
+
+		return IV;
 	}
 }
 
