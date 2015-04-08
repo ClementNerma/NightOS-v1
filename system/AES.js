@@ -50,7 +50,7 @@ var AES = window.AES = {
 		}
 
 		return key;
-	}
+	},
 	
 	generateIV: function(length) {
 		/* length is in bits
