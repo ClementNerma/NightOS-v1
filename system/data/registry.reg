@@ -94,7 +94,7 @@
 
 		"storage": {
 
-			"readable": ["/system/boot/*", "/system/apps/*", "/apps/*"]
+			"readable": ["/system/boot/*", "/system/apps/*", "/apps/*", "/users/common-data/*"]
 
 		}
 

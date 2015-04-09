@@ -1,5 +1,5 @@
 
-var AES = window.AES = {
+var AES = {
 	encrypt: function(decrypted, key) {
 		return CryptoJS.AES.encrypt(decrypted, key);
 	},

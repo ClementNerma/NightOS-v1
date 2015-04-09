@@ -35,9 +35,8 @@ var Console = function(context, setDefaultInvite) {
 		backgroundColor: 'black',
 		overflow: 'auto'
 	}).keydown(function(e) {
+		//$(this).find('.cmd:last').focus(); // doesn't work
 		return Consoles.get(this.getAttribute('con-id')).keydown(e);
-	}).click(function(e) {
-		return false;
 	});
 
 	this.keydown = function(e) {
@@ -82,7 +81,7 @@ var Console = function(context, setDefaultInvite) {
 
 	this.text = function(text, noJump) {
 
-		_console.innerHTML += (noJump ? '' : '<br />') + text.escapeHTML().replace(/\\n/g, '<br />').replace(/ /g, '&nbsp;');
+		_console.innerHTML += (noJump ? '' : '<br />') + text.escapeHTML().replace(/ /g, String.fromCharCode(160)).replace(/\n/g, '<br/>');
 
 	}
 

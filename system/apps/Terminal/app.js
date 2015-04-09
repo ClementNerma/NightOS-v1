@@ -12,6 +12,7 @@ terminal.invite();
 
 $('#terminal').focus();
 
+/*
 App.events.on('quit', function() {
 
 	Dialogs.confirm('Application closer', 'Do you really want to close the terminal ?', function() {
@@ -21,3 +22,4 @@ App.events.on('quit', function() {
 	}, function() {});
 
 });
+*/

@@ -3,7 +3,7 @@
   * OS informations
   */
 
-var System = window.System = {
+var System = {
 
 	name: 'NightOS',
 	version: '0.1',

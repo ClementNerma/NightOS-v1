@@ -1,0 +1,28 @@
+{
+	"syntaxTheme": true,
+	"name": "default",
+	"version": "0.1",
+	"creator": "Clement Nerma",
+
+	"colors": {
+
+		"function": {
+			"base": ["blue", "italic"],
+			"name": ["green"],
+			"args": ["orange"]
+		},
+
+		"variable": {
+			"base": ["blue"]
+		},
+
+		"native": {
+			"base": ["red"]
+		},
+
+		"keywords": {
+			"base": ["red"]
+		}
+
+	}
+}

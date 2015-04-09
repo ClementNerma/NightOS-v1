@@ -18,11 +18,11 @@
 
 <script type="text/javascript" charset="utf-8">
 
-	var users = fs.readdirSync('users');
+	var users = fs.readdirSync('system/users');
 	var user  = null;
 
 	for(var i in users)
-		if(fs.lstatSync('users/' + users[i]).isDirectory())
+		if(fs.lstatSync('users/' + users[i].replace(/\.usr$/, '')).isDirectory())
 			$('#gallery').append($(new Image()).click(function() {
 				user = this.getAttribute('user');
 
@@ -45,7 +45,7 @@
 					top: document.getElementById('form').offsetTop + 10,
 					left: document.body.offsetWidth / 2 - 32
 				}, 1000);
-			}).attr('user', users[i]).attr('src', 'data:image/png;base64,' + Core.users.get(users[i]).picture)).attr('title', 'Login as ' + users[i]);
+			}).attr('user', users[i].replace(/\.usr$/, '')).attr('src', 'data:image/png;base64,' + Core.users.get(users[i].replace(/\.usr$/, '')).picture)).attr('title', 'Login as ' + users[i].replace(/\.usr$/, ''));
 
 	$('#form').hide();
 	$('#users').hide().fadeIn(1000);

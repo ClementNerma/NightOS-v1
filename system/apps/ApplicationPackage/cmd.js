@@ -3,13 +3,13 @@ if(!args[0])
 	return con.error('Invalid argument. Please see apkg --help for more informations');
 
 if(args[0] == '--help')
-	return con.write('The NightOS application package manager permit to install, get or remove applications from your computer.<br /><br />'
-					+'apkg install [name | -f file | --file file]<br />'
-					+'    install an application from NightOS repositories or from a file<br />'
-					+'    -f Install an application from a local file<br /><br />'
-					+'apkg remove [name]<br />'
-					+'    remove an application<br />'
-		)
+	return con.text("The NightOS application package manager permit to install, get or remove applications from your computer.\n"
+					+"apkg install [name | -f file | --file file]\n"
+					+"    install an application from NightOS repositories or from a file\n"
+					+"    -f Install an application from a local file\n\n"
+					+"apkg remove [name]\n"
+					+"    remove an application\n"
+				);
 
 if(args[0] == 'install') {
 

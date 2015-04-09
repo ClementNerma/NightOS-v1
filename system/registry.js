@@ -6,7 +6,7 @@
 
 // applications which use registry must have admin rights !
 
-var Registry = window.Registry = new function() {
+var Registry = new function() {
 
 	var _reg = null;
 

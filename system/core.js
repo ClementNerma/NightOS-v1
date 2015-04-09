@@ -1,4 +1,25 @@
 
+var define = new function() {
+
+	var vars = {};
+
+	this.exec = function(name, value) {
+
+		if(typeof(value) !== 'undefined')
+			vars[name] = value;
+
+		return vars[name];
+
+	}
+
+}
+
+var def = function(name, value) {
+
+	return define.exec(name, value);
+
+}
+
 var fs = require('fs');
 
 /**
@@ -6,7 +27,7 @@ var fs = require('fs');
   * @constructor
   */
 
-var Core = window.Core = new function() {
+var Core = new function() {
 
 	/**
 	  * crypto
@@ -355,19 +376,19 @@ var Core = window.Core = new function() {
 				package.rights = 3;
 
 			if(package.rights >= 3 && ((typeof(adminPass) === 'undefined' && adminPass === true) || runAsAdmin)) {
-				window.toLaunchApp = name;
-				window.toLaunchAppArgs = args;
+				def('toLaunchApp', name);
+				def('toLaunchAppArgs', args);
 
 				if(!Core.users.isAdmin())
 					return Dialogs.input('User account control', 'The ' + name + ' application require a rights level which require admin rights.<br />Please input the admin password :', 'password', function(pass) {
 
-						Core.applications.launch(window.toLaunchApp, window.toLaunchAppArgs, undefined, pass);
+						Core.applications.launch(def('toLaunchApp'), def('toLaunchAppArgs'), undefined, pass);
 
 					});
 				else
 					return Dialogs.confirm('User account control', 'The ' + name + ' application require a rights level which require admin rights.<br />Do you want to continue ?', function(pass) {
 
-						Core.applications.launch(window.toLaunchApp, window.toLaunchAppArgs, undefined, true);
+						Core.applications.launch(def('toLaunchApp'), def('toLaunchAppArgs'), undefined, true);
 
 					});
 			}
@@ -931,11 +952,12 @@ var Core = window.Core = new function() {
 			echo: function(args, con) {
 
 				var txt = args.join(' ');
+				var vars = Core.vars.vars();
 
 				for(var i in vars)
-					path = path.replace(new RegExp('\\$' + i + '\\$', 'gi'), vars[i]);
+					txt = txt.replace(new RegExp('\\$' + i + '\\$', 'gi'), vars[i]);
 
-				
+				con.text(txt);
 
 			},
 
@@ -1074,7 +1096,7 @@ var Core = window.Core = new function() {
 		this.exec = function(cmd, con) {
 
 			if(!(con instanceof Console))
-				var con = new Console($(document.createElement('textarea')));
+				var con = new Console($(document.createElement('div')));
 
 			var cmds = cmd.split('&&');
 
@@ -1120,17 +1142,22 @@ var Core = window.Core = new function() {
 
 				var app = Core.applications.get(cmd_name);
 
+				def('sync', true);
+
 				if(app) {
-					window.nextcmd = app;
-					window.nextcon = con;
-					window.nextargs = args;
+					def('nextcmd', app);
+					def('nextcon', con);
+					def('nextargs', args);
 					
 					if(!app.isSystem)
 						Dialogs.confirm('Command line interpreter', 'The command you will run will be use the current application rights. Continue uniquely if you\'re sure about what you are doing.', function() {
-							new Function(['con', 'args'], window.nextcmd.commandLine)(window.nextcon, window.nextargs);
+							new Function(['con', 'args'], def('nextcmd').commandLine)(def('nextcon'), def('nextargs'));
 						});
 					else
-						new Function(['con', 'args'], app.commandLine)(window.nextcon, args);
+						new Function(['con', 'args'], app.commandLine)(def('nextcon'), args);
+
+					if(def('sync'))
+						con.invite();
 
  				} else {
 					con.error('Command not found : ' + cmd_name);

@@ -103,9 +103,9 @@
 
 	position: absolute;
 	top: 40px;
-	right: 0;
-	left: 0;
-	bottom: 0;
+	right: -1px;
+	left: -1px;
+	bottom: -5px;
 	width: auto;
 	height: auto;
 	z-index: 99999;

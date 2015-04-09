@@ -1,0 +1,49 @@
+{
+	"syntaxLanguageSheet": true,
+	"name": "JavaScript",
+	"version": "0.1",
+	"creator": "Clement Nerma",
+
+	"rules": [
+		{
+			"name": "function",
+			"match": "function( *)([a-zA-Z0-9_]+)( *)\\(([a-zA-Z0-9_, ]+)\\)",
+			"vn": 4,
+			"vars": {
+				"base": "function",
+				"name": "$2",
+				"args": "$4"
+			}
+		},
+
+		{
+			"name": "variable",
+			"match": "var( *)([a-zA-Z0-9_]+)",
+			"is_word": true,
+			"vn": 2,
+			"vars": {
+				"base": "var",
+				"name": "$2"
+			}
+		},
+
+		{
+			"name": "native",
+			"match": "document|JSON|Object|Math|Number|Boolean|Function",
+			"is_word": true,
+			"vn": "0",
+			"vars": {
+				"base": "$0"
+			}
+		},
+
+		{
+			"name": "keywords",
+			"match": "new|delete",
+			"is_word": true,
+			"vars": {
+				"base": "$0"
+			}
+		}
+	]
+}

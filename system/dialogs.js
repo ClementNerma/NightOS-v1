@@ -1,5 +1,5 @@
 
-var Dialogs = window.Dialogs = new function() {
+var Dialogs = new function() {
 
 	var validate = null;
 

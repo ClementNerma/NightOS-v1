@@ -3,7 +3,7 @@
   * @constructor
   */
 
-var Explorer = window.Explorer = new function() {
+var Explorer = new function() {
 
 	/**
 	  * Explorer.DOM constructor

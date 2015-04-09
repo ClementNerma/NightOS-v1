@@ -4,7 +4,7 @@
   * @constructor
   */
 
-var UI = window.UI = new function() {
+var UI = new function() {
 
 	this.mouseX = null;
 	this.mouseY = null;

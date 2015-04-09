@@ -4,7 +4,7 @@
  * @constructor
  */
 
-var Storage = window.Storage = new function() {
+var Storage = new function() {
 
 	var fs = require('fs');
 	var appDirectory = directory;
@@ -192,7 +192,7 @@ var Storage = window.Storage = new function() {
 
 		App.pushStack(0);
 
-		from = authorize('moveFile');
+		from = authorize('copyFile');
 
 		if(!from) {
 			App.pushStack(-1);
@@ -314,7 +314,13 @@ var Storage = window.Storage = new function() {
 
 	}
 
-	this.getFileInformations = function(_cert, directory) {
+	/**
+	  * Get informations from a file, such as size...
+	  * @param {string} path The file path
+	  * @return {Boolean|Object} Return false if an error occured, else return an object which contains many informations on the file
+	  */
+
+	this.getFileInformations = function(_cert, path) {
 
 		App.pushStack(0);
 
@@ -344,6 +350,12 @@ var Storage = window.Storage = new function() {
 		}
 
 	}
+
+	/**
+	  * Get the size of a file
+	  * @param {string} path The file path
+	  * @return {Boolean|Object} Return false if an error occured, else return the file size
+	  */
 
 	this.getFileSize = function(_cert, directory) {
 

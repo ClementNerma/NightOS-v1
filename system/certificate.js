@@ -7,7 +7,7 @@
  * @param {Object} permissions The application permissions (storage & access) (specified in the application package)
  */
 
-var Certificate = window.Certificate = function(ID, rights, permissions, access) {
+var Certificate = function(ID, rights, permissions, access) {
 
 	this.ID = ID;
 	this.rights = rights;
