@@ -1,8 +1,21 @@
 
+/**
+  * Generate a button for the application GUI
+  * @constructor
+  * @param {string} text [Optionnal] The label of the button
+  * @param {Function} onclick [Optionnal] Callback for the 'click' event
+  */
+
 var Button = function(text, onclick) {
 
 	var _DOM = document.createElement('button');
 	_DOM.className = 'gui-button';
+
+	/**
+	  * Change the label of the button
+	  * @param {string} text The label of the button
+	  * @return {Boolean}
+	  */
 
 	this.setText = function(text) {
 
@@ -14,13 +27,26 @@ var Button = function(text, onclick) {
 
 		_DOM.innerText = text;
 
+		return true;
+
 	}
+
+	/**
+	  * Get the current label of the buttin
+	  * @return {string}
+	  */
 
 	this.text = function() {
 
 		return _DOM.innerText;
 
 	}
+
+	/**
+	  * Add an event listener to the button
+	  * @param {string} event The event name, such as 'click' or 'mouseover'
+	  * @param {Function} callback The callback for the event
+	  */
 
 	this.addEventListener = function(event, callback) {
 

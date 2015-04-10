@@ -13,6 +13,15 @@ var Layout = function() {
 	var _caseWidth = 50;
 	var _caseHeight = 30;
 
+	/**
+	  * Append an element to the application layout
+	  * @param {Object} The element you want to add to the layout. It must be a GUI widget, such as TextEdit, etc.
+	  * @param {Number} X The X position of the element
+	  * @param {Number} Y The Y position of the element
+	  * @param {Number} width [Optionnal] The element width
+	  * @param {Number} height [Optionnal] The element height
+	  */
+
 	this.append = function(element, X, Y, width, height) {
 
 		if(!element.DOM || !element.DOM())

@@ -1,9 +1,20 @@
 
+/**
+  * The default GUI for all applications
+  * @constructor
+  */
+
 var GUI = function() {
 
 	var _layout;
 	var _menuBar;
 	var _statusBar;
+
+	/**
+	  * Set a menu bar to your application window
+	  * @param {MenuBar} menuBar
+	  * @return {Boolean}
+	  */
 
 	this.setMenuBar = function(menuBar) {
 
@@ -21,13 +32,26 @@ var GUI = function() {
 		if(_layout)
 			_layout.DOM().style.top = '25px';
 
+		return true;
+
 	}
+
+	/**
+	  * Get the current application menu bar
+	  * @return {MenuBar}
+	  */
 
 	this.menuBar = function() {
 
 		return _menuBar;
 
 	}
+
+	/**
+	  * Set a layout to your application window
+	  * @param {Layout} layout
+	  * @return {Boolean}
+	  */
 
 	this.setLayout = function(layout) {
 
@@ -42,15 +66,28 @@ var GUI = function() {
 		if(_statusBar)
 			_layout.DOM().style.bottom = '25px';
 
-		document.body.appendChild(_layout.DOM())
+		document.body.appendChild(_layout.DOM());
+
+		return true;
 
 	}
+
+	/**
+	  * Get the current application layout
+	  * @return {Layout}
+	  */
 
 	this.layout = function() {
 
 		return _layout;
 
 	}
+
+	/**
+	  * Set a status bar to your application window
+	  * @param {StatusBar} statusBar
+	  * @return {Boolean}
+	  */
 
 	this.setStatusBar = function(statusBar) {
 
@@ -68,7 +105,14 @@ var GUI = function() {
 		if(_layout)
 			_layout.DOM().style.bottom = '25px';
 
+		return true;
+
 	}
+
+	/**
+	  * Get the current application status bar
+	  * @return {StatusBar}
+	  */
 
 	this.statusBar = function() {
 

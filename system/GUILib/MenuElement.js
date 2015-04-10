@@ -16,6 +16,12 @@ var MenuElement = function(text) {
 
 	}
 
+	/**
+	  * Change the label of the element
+	  * @param {string} text The label of the element
+	  * @return {Boolean}
+	  */
+
 	this.setText = function(text) {
 
 		if(typeof(text) === 'number')
@@ -28,11 +34,21 @@ var MenuElement = function(text) {
 
 	}
 
+	/**
+	  * Get the current label of the buttin
+	  * @return {string}
+	  */
+
 	this.text = function() {
 
 		return _label.innerText;
 
 	}
+
+	/**
+	  * Change the element visibility
+	  * @param {Boolean} visible
+	  */
 
 	this.setVisible = function(visible) {
 
@@ -41,11 +57,22 @@ var MenuElement = function(text) {
 
 	}
 
+	/**
+	  * Know if the element is visible
+	  * @return {Number} Return 0 or 1
+	  */
+
 	this.visible = function() {
 
 		return _visible;
 
 	}
+
+	/**
+	  * Add a MenuItem object to the menu element
+	  * @param {MenuItem} item
+	  * @return {Boolean}
+	  */
 
 	this.addItem = function(item) {
 
