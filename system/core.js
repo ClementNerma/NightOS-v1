@@ -544,7 +544,7 @@ var Core = new function() {
 
 		this.isValidName = function(name) {
 
-			return (name.replace(/[^a-zA-Z0-9 _\-]/g, '') === name);
+			return (name.replace(/[^a-zA-Z0-9 _\-\.]/g, '') === name);
 
 		}
 
@@ -578,7 +578,10 @@ var Core = new function() {
 			if(package.rights != 1 && package.rights != 2 && package.rights != 3 && package.rights != 4)
 				return Debug.error('Invalid rights [' + package['rights'] + ']');
 
-			for(var i in files)
+			if(typeof package.files !== 'object')
+				return Debug.error('Missing application files');
+
+			for(var i in package.files)
 				if(!this.isValidName(i))
 					return Debug.error('Invalid file name [' + i + ']');
 
@@ -1231,6 +1234,31 @@ var Core = new function() {
 		catch(e) {
 			throw new Error('Unable to load main stylesheet [' + file + ']. Make sure that this directory is readable.<br /><br />' + e.message);
 		}
+
+		try {
+			if(!Syntax.themes.load('default', fs.readFileSync(Core.path.format('/users/common-data/syntax/themes/default.syx'), 'utf8')))
+				throw new Error('Invalid file format')
+		}
+
+		catch(e) {
+			throw new Error('Cannot load default syntax theme.<br /><br />Details :<br /><br />' + new String(e));
+		}
+		
+		try {
+			if(!Syntax.languages.load('plain', fs.readFileSync(Core.path.format('/users/common-data/syntax/languages/plain.syx'), 'utf8')))
+				throw new Error('Invalid file format')
+		}
+
+		catch(e) {
+			throw new Error('Cannot load plain syntax language.<br /><br />Details :<br /><br />' + new String(e));
+		}
+
+		try {
+			Syntax.languages.load('javascript', fs.readFileSync(Core.path.format('/users/common-data/syntax/languages/javascript.syx'), 'utf8'));
+		}
+
+		catch(e) {}
+		
 
 		if(applicationLauncher)
 			return true;

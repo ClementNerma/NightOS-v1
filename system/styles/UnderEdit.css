@@ -1,11 +1,11 @@
 
-/* Format TextEdit elements */
+/* Format UnderEdit elements */
 
 textarea[EditorID].text-editor {
 
 	opacity: 1;
 
-	color: #000000;
+	color: white;
 	-webkit-text-fill-color: transparent;
 
 	border: 0px solid transparent;
@@ -16,6 +16,7 @@ textarea[EditorID].text-editor {
 pre[EditorID].text-editor-underground {
 
 	color: white;
+	background-color: #524F52;
 	position: absolute;
 	z-index: -1;
 

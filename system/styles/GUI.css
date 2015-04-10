@@ -1,29 +1,100 @@
 
-#GUI_menuBar {
+#gui-menubar {
 
 	position: absolute;
-	top: 0;
+	top: 0px;
 	left: 0;
 	right: 0;
-	height: 40px;
-	z-index: 999999;
+	height: 25px;
+	padding-top: 1px;
 	border-bottom: 1px solid gray;
+	background-color: #D4D4D4;
 
 }
 
-.GUIMenuBarChild {
+#gui-statusbar {
 
-	display: inline-block;
-	background-color: white;
-	padding: 5px;
+	position: absolute;
+	bottom: 25px;
+	padding-top: 1px;
+	left: 0;
+	right: 0;
+	height: 25px;
+	padding-top: 1px;
+	border-top: 1px solid gray;
+	background-color: #E6E4E4;
+
+}
+
+#gui-menubar:hover, #gui-statusbar:hover, .gui-menu-element:hover, .gui-menu-element *:hover {
+
+	cursor: default;
+
+}
+
+.gui-menu-element {
+
+	padding: 2px;
+	padding-left: 5px;
+	padding-right: 5px;
+	border-right: 1px solid gray;
+	background-color: #E6E4E4;
+	float: left;
+	margin-bottom: -2px;
 	border-right: 1px solid gray;
 
 }
 
-.GUIMenuBarChild:hover {
+.gui-menu-element div {
 
-	background-color: blue;
-	color: white;
+	margin-bottom: 3px;
+
+}
+
+.gui-menu-element[opened] div {
+
+	margin-bottom: 5px;
+
+}
+
+.gui-menu-element div + span {
+
+	border-top: 1px solid gray;
+
+}
+
+.gui-menu-element span:last-child {
+
+	margin-bottom: -3px;
+
+}
+
+.gui-menu-element span {
+
+	padding: 5px;
+	color: gray;
+	display: none;
+	border-bottom: 1px solid gray;
+	width: 100%;
+	margin-left: -5px;
+
+}
+
+.gui-menu-element span[enabled] {
+
+	color: black;
+
+}
+
+.gui-menu-element[opened] span {
+
+	display: block;
+
+}
+
+.gui-menu-element[opened] span:hover {
+
+	background-color: #D4D4D4;
 	cursor: pointer;
 
 }

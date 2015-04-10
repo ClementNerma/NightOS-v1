@@ -72,9 +72,7 @@ var Syntax = new function() {
 		var rules = language.rules;
 		var color = theme.colors;
 
-		"...\nfunction salut\n...".replace(/function salut/g, function(match, $1, $2, $3, $4, $5, $6, $7, $8, $9) {
-		    return match.replace(/function/, '[function]')
-		})
+		code = code.escapeHTML();
 
 		for(var i in rules) {
 
@@ -117,19 +115,3 @@ var Syntax = new function() {
 Object.freeze(Syntax);
 Object.freeze(Syntax.themes);
 Object.freeze(Syntax.languages);
-
-try {
-	Syntax.themes.load('default', fs.readFileSync('users/common-data/syntax/themes/default.syx', 'utf8'));
-}
-
-catch(e) {
-	console.error('Cannot load theme', e)
-}
-
-try {
-	Syntax.languages.load('javascript', fs.readFileSync('users/common-data/syntax/languages/javascript.syx', 'utf8'));
-}
-
-catch(e) {
-	console.error('Cannot load language', e)
-}

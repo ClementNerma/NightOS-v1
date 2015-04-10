@@ -224,7 +224,7 @@ var Storage = new function() {
 		if(BUFF_LENGTH > System.FileSystem.maxBufferLength)
 			throw new Error(System.errors.BUFFER_TOO_LARGE);
 
-		var _buf = new Buffer(BUFF_LENGTH);
+		var _buff = new Buffer(BUFF_LENGTH);
 
 	    var fdr = fs.openSync(srcFile, 'r')
 	    var stat = fs.fstatSync(fdr)
@@ -233,7 +233,7 @@ var Storage = new function() {
 	    var pos = 0
 
 	    while (bytesRead > 0) {
-		    bytesRead = fs.readSync(fdr, _buff, 0, BUF_LENGTH, pos)
+		    bytesRead = fs.readSync(fdr, _buff, 0, BUFF_LENGTH, pos)
 		    fs.writeSync(fdw, _buff, 0, bytesRead)
 		    pos += bytesRead
 	    }

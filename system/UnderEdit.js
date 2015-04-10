@@ -1,24 +1,26 @@
 
 /**
-  * TextEdit tool
+  * UnderEdit tool
   * @constructor
   */
 
-var TextEdits      = 0;
-var TextEditInputs = {};
+var UnderEdits      = 0;
+var UnderEditInputs = {};
 
-var TextEdit = function(context, width, height) {
+var UnderEdit = function(context, width, height) {
 
-	var underground = $(document.createElement('pre')).attr('EditorID', TextEdits++ + 1)
+	var underground = $(document.createElement('pre')).attr('EditorID', UnderEdits++ + 1)
 		.addClass('text-editor-underground');
 
+	console.log(context);
+
 	var context = $(context)
-		.attr('EditorID', TextEdits)
+		.attr('EditorID', UnderEdits)
 		.addClass('text-editor')
 		.after(underground)
 		.on('input', function(e) {
 
-			TextEditInputs[this.getAttribute('EditorID')](this.value, $('pre[EditorID=' + this.getAttribute('EditorID') + ']'), this, e);
+			UnderEditInputs[this.getAttribute('EditorID')](this.value, $('pre[EditorID=' + this.getAttribute('EditorID') + ']'), this, e);
 
 		})
 		.on('scroll', function(e) {
@@ -29,7 +31,7 @@ var TextEdit = function(context, width, height) {
 
 		})
 
-	var EditorID = TextEdits;
+	var EditorID = UnderEdits;
 
 	this.refresh = function() {
 
@@ -48,6 +50,12 @@ var TextEdit = function(context, width, height) {
 
 	this.refresh();
 
+	this.content = function() {
+
+		return context.val();
+
+	}	
+
 	this.setContent = function(content) {
 
 		underground.text(content);
@@ -55,9 +63,18 @@ var TextEdit = function(context, width, height) {
 
 	}
 
+	this.setHTML = function(content) {
+
+		underground.html(content);
+
+	}
+
 	this.input = function(callback) {
 
-		TextEditInputs[EditorID] = callback;
+		if(!callback)
+			return UnderEditInputs[EditorID]();
+
+		UnderEditInputs[EditorID] = callback;
 
 	}
 

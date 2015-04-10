@@ -5,7 +5,7 @@
 	"creator": "Clément Nerma",
 
 	"permissions": {
-		"storage": ["file_read", "file_write", "folder_read"]
+		"storage": ["*"]
 	},
 
 	"access": ["/*"],
