@@ -10,7 +10,7 @@ App.dialog.input('Prompt', 'What is your name ?', 'text', function(val) {
 
 		age = val;
 
-		App.dialog.alert('Your name is ' + name + ' and you are ' + age.toString() + ' years-old !');
+		App.dialog.alert('Hello !', 'Your name is ' + name + ' and you are ' + age.toString() + ' years-old !');
 
 	});
 

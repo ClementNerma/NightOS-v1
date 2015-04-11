@@ -663,33 +663,33 @@ var Core = new function() {
 
 			for(var i in package.files) {
 
-				out.write('| Writing ' + i.escapeHTML() + '...', true);
+				out.write('| Writing ' + i.escapeHTML() + '...');
 
 				if(!App.writeFile(dir + i, package.files[i])) {
 					App.removeDir(dir);
 					return out.error('Can\'t write an application file [' + i + ']');
 				}
 
-				out.write(' - Successfull');
+				out.write(' - Successfull', true);
 
 			}
 
 			delete package.files;
 
-			out.write('| Writing package.prm...', true);
+			out.write('| Writing package.prm...');
 
 			if(!App.writeFile(dir + 'package.prm', JSON.stringify(package))) {
 				App.removeDir(dir);
 				return out.error('Can\'t write the application package [package.prm]');
 			}
 
-			out.write(' - Successfull');
+			out.write(' - Successfull', true);
 
 			out.write('Writing registry...');
 
 			var d = new Date();
 
-			Registry.write('applications/' + name, {
+			if(Registry.write('applications/' + name, {
 
 				installed: {
 					str: d.toString(),
@@ -700,8 +700,10 @@ var Core = new function() {
 
 				package: o_p
 
-
-			});
+			}))
+				out.write(' - Successfull', true);
+			else
+				out.error(' - Failed', true);
 
 			out.write('The application has been sucessfully installed !');
 
@@ -1075,6 +1077,65 @@ var Core = new function() {
 
 				try { con.write(new Function(args[0])()) }
 				catch(e) { con.error('An error has occured : ' + new String(e)); }
+
+			},
+
+			exists: function(args, con) {
+
+				if(!args[0])
+					return con.error('Missing path');
+
+				con.write(App.exists(args[0]) ? 'true' : 'false');
+
+			},
+
+			fexists: function(args, con) {
+
+				if(!args[0])
+					return con.error('Missing path');
+
+				con.write(App.fileExists(args[0]) ? 'true' : 'false');
+
+			},
+
+			dexists: function(args, con) {
+
+				if(!args[0])
+					return con.error('Missing path');
+
+				con.write(App.directoryExists(args[0]) ? 'true' : 'false');
+
+			},
+
+			copy: function(args, con) {
+
+				if(!args[0] || !args[1])
+					return con.error('Missing arguments');
+
+				con.write('Copying...');
+
+				if(App.copyFile(args[0], args[1]))
+					con.write(' - Done !', true);
+				else if(App.lastStack(-1))
+					con.error('Needs privileges elevation');
+				else
+					con.error('An error has occured');
+
+			},
+
+			move: function(args, con) {
+
+				if(!args[0] || !args[1])
+					return con.error('Missing arguments');
+
+				con.write('Moving...');
+
+				if(App.moveFile(args[0], args[1]))
+					con.write(' - Done !', true);
+				else if(App.lastStack(-1))
+					con.error('Needs privileges elevation');
+				else
+					con.error('An error has occured');
 
 			}
 

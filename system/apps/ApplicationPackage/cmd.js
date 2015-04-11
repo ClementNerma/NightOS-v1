@@ -36,7 +36,7 @@ if(args[0] == 'install') {
 		if(!Core.applications.isSignedPackage(app))
 			con.warn('The application package is not signed. This can cause security issues');
 
-		Core.applications.installFromPackage(app, con);
+		return Core.applications.installFromPackage(app, con);
 
 	} else {
 
@@ -52,8 +52,34 @@ if(args[0] == 'install') {
 		return con.error('No application name specified');
 
 	if(!Core.applications.exists(args[1]))
-		return con.error('The application [' + args[1].escapeHTML() + '] doesn\'t exists');
+		return con.error('The application [' + args[1].escapeHTML() + '] is not installed on this computer');
 
 	// can remove the application
 
-}
+} else if(args[0] === 'installed') {
+
+	// Check if an application is installed
+
+	if(!args[1])
+		return con.error('No application name specified');
+
+	return con.text(Core.applications.exists(args[1]).toString());
+
+} else if(args[0] === 'launch') {
+
+	// Launch an application
+
+	if(!args[1])
+		return con.error('No application name specified');
+
+	if(!Core.applications.exists(args[1]))
+		return con.error('The application [' + args[1].escapeHTML() + '] is not installed on this computer');
+
+	return Core.applications.launch({
+		origin: 'CommandLine',
+		from: 'ApplicationPackage'
+	});
+
+} else
+	return con.error('Invalid parameters.<br />See apkg --help for more informations.');
+
