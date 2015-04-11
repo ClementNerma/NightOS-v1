@@ -90,10 +90,17 @@ function openProject(path) {
 
 	$('#projects, #new-project').remove();
 	$('#editor').show();
-	$('#panel').html('<div>package.prm</div><div>app.js</div>' + (_cmd ? '<div>cmd.js</div>' : '') + (_uninstaller ? '<div>uninstaller.js</div>' : ''));
-	$('#panel div').click(function() {
-		openFile(proj + '/' + this.innerHTML);
-	});
+		
+	var files = App.readDir(path);
+
+	if(!files)
+		return Dialogs.error('SDK - Error', 'Can\'t get the template files');
+
+	for(var i in files)
+		$('#panel').append($(document.createElement('div')).text(files[i]).click(function() {
+			openFile(proj + '/' + this.innerHTML);
+		}))
+
 	$('#panel').show();
 
 	editor.refresh();
@@ -184,7 +191,8 @@ function saveFile(callback) {
 		if(!App.writeFile(file, editor.content()))
 			Dialogs.error('SDK - Write failed', 'Cannot write ' + file + ' file.' + (App.lastStack(-1) ? '<br />Needs privileges elevation' : ''));
 		else {
-			c();
+			if(typeof c === 'function')
+				c();
 			changes = false;
 		}
 	} else
@@ -233,6 +241,41 @@ function buildApp() {
 	$('#build-log').show();
 	buildError = false;
 	Core.commandLine.exec('make "' + proj + '" "' + proj + '/package.app"', con);
+
+}
+
+function installApp() {
+
+	if(!App.fileExists(proj + '/package.app'))
+		return Dialogs.error('SDK - Install', 'Cannot install the application because missing file package.app');
+
+	Core.applications.launch('ApplicationPackage', {
+		openFile: proj + '/package.app',
+		origin: 'SDK',
+		from: App.name
+	});
+
+}
+
+function runApp() {
+
+	try {
+		var name = JSON.parse(App.readFile(proj + '/package.prm')).name;
+	}
+
+	catch(e) {
+		return Dialogs.error('SDK - Run', 'Cannot read package.prm file because it\'s not a valid JSON file');
+	}
+
+	if(!Core.applications.exists(name))
+		return Dialogs.error('SDK - Run', 'The application [' + name + '] is not installed on this computer');
+
+	Debug.info('[SDK] Running application : ' + name);
+
+	Core.applications.launch(name, {
+		origin: 'SDK',
+		from: App.name
+	});
 
 }
 
@@ -321,6 +364,8 @@ var _quit    = new MenuItem('Quit', quitFile);
 
 var buildMenu = new MenuElement('Build');
 var _build    = new MenuItem('Build application...', buildApp);
+var _install  = new MenuItem('Install', installApp);
+var _run      = new MenuItem('Run...', runApp);
 
 enableMenu(false);
 
@@ -331,6 +376,8 @@ fileMenu.addItem(_saveAs);
 fileMenu.addItem(_quit);
 
 buildMenu.addItem(_build);
+buildMenu.addItem(_install);
+buildMenu.addItem(_run);
 
 menuBar.addElement(fileMenu);
 menuBar.addElement(buildMenu);

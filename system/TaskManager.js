@@ -43,7 +43,7 @@ var TaskManager = new function() {
 						}
 						
 						catch(e) {
-							console.error('[Task Manager] Can\'t stop application !');
+							Debug.error('[Task Manager] Can\'t stop application !');
 							Dialogs.error('Task Manager', 'Can\'t stop application. Please try again.<br /><br />Details :<br /><br />' + new String(e));
 						}
 

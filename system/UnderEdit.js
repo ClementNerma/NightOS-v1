@@ -12,8 +12,6 @@ var UnderEdit = function(context, width, height) {
 	var underground = $(document.createElement('pre')).attr('EditorID', UnderEdits++ + 1)
 		.addClass('text-editor-underground');
 
-	console.log(context);
-
 	var context = $(context)
 		.attr('EditorID', UnderEdits)
 		.addClass('text-editor')

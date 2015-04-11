@@ -226,10 +226,10 @@ Application.prototype.dialog = new function() {};
  * Display an alert dialog box
  * @param {string} title Dialog title
  * @param {string} content Dialog content
- * @param {function} callback Dialog callback
+ * @param {function} buttons Dialog buttons
  */
 
-Application.prototype.dialog.alert = function(msg) { return Dialogs.alert(msg); }
+Application.prototype.dialog.alert = function(title, content, buttons) { return Dialogs.alert(title, content, buttons); }
 
 /*
  * Display an info dialog box
@@ -238,7 +238,7 @@ Application.prototype.dialog.alert = function(msg) { return Dialogs.alert(msg); 
  * @param {function} callback Dialog callback
  */
 
-Application.prototype.dialog.info = function(msg) { return Dialogs.info(msg); }
+Application.prototype.dialog.info = function(title, content, callback) { return Dialogs.info(title, content, callback); }
 
 /*
  * Display a warning dialog box
@@ -247,7 +247,7 @@ Application.prototype.dialog.info = function(msg) { return Dialogs.info(msg); }
  * @param {function} callback Dialog callback
  */
 
-Application.prototype.dialog.warning = function(msg) { return Dialogs.warning(msg); }
+Application.prototype.dialog.warning = function(title, content, callback) { return Dialogs.warning(title, content, callback); }
 
 /*
  * Display an error dialog box
@@ -256,7 +256,7 @@ Application.prototype.dialog.warning = function(msg) { return Dialogs.warning(ms
  * @param {function} callback Dialog callback
  */
 
-Application.prototype.dialog.error = function(msg) { return Dialogs.error(msg); }
+Application.prototype.dialog.error = function(title, content, callback) { return Dialogs.error(title, content, callback); }
 
 /*
  * Display a confirmation dialog box
@@ -266,7 +266,7 @@ Application.prototype.dialog.error = function(msg) { return Dialogs.error(msg); 
  * @param {function} no Dialog callback on no
  */
 
-Application.prototype.dialog.confirm = function(msg) { return Dialogs.confirm(msg); }
+Application.prototype.dialog.confirm = function(title, content, yes, no) { return Dialogs.confirm(title, content, yes, no); }
 
 /*
  * Display an input dialog box
@@ -276,7 +276,7 @@ Application.prototype.dialog.confirm = function(msg) { return Dialogs.confirm(ms
  * @param {function} callback Dialog callback
  */
 
-Application.prototype.dialog.input = function(msg) { return Dialogs.input(msg); }
+Application.prototype.dialog.input = function(title, content, type, callback) { return Dialogs.input(title, content, type, callback); }
 
 /* System events */
 

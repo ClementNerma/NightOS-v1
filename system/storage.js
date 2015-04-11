@@ -619,12 +619,12 @@ var Storage = new function() {
 		App.pushStack(0);
 
 		if(!authorize('loadFrame', true))
-			return false;
+			return Debug.error(System.errors.NOPERM);
 
 		var path = Core.path.format(appDirectory + '/' + name.replace(/[^a-zA-Z0-9 _\-]/g, '') + '.frm')
 
 		if(!_cert.hasPermission(['storage', 'load_frame']))
-			return false;
+			return Debug.error(System.errors.NOPERM);
 			//throw new Error(System.errors.NOPERM);
 
 		if(typeof(context) !== 'object')
@@ -637,7 +637,7 @@ var Storage = new function() {
 
 		catch(e) {
 			//throw new Error('Can\'t load application frame [' + path + ']<br /><br />Details :<br /><br />' + e.message);
-			return false;
+			return Debug.error('Cannot load application frame : ' + new String(e));
 		}
 
 	}

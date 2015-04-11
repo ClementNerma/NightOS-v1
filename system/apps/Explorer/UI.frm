@@ -35,8 +35,6 @@ function loadPath(path) {
 	path = Core.path.format(path);
 
 	if(!App.directoryExists(path)) {
-		console.info(Dialogs);
-		console.info(Dialogs.error)
 		Dialogs.error('Explorer - Open failed', 'Can\'t open ' + Core.path.format(path).replace(Core.path.root, '') + "\n\nPlease make sure that this path is a directory and is readable.");
 		return false;
 	}

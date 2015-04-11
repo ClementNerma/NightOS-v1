@@ -245,8 +245,6 @@ var Explorer = new function() {
  	 	if(!app)
 	 		app = Registry.read('filesys/unknown/open');
 
-	 	console.log(app);
-
 	 	if(app.substr(0, 4) === 'sys:')
  	 		if(typeof(Explorer.FileSystem[app.substr(4)]) === 'function') {
  	 			//console.log('open : ' + app.substr(4), file);

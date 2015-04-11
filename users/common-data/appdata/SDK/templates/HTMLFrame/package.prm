@@ -6,7 +6,7 @@
 	"rights": 2,
 
 	"permissions": {
-		"storage": ["load_frame"] // allow the application to load frames
+		"storage": ["load_frame"]
 	},
 
 	"access": []

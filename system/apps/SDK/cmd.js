@@ -5,8 +5,6 @@ if(!args[0])
 if(!args[1])
 	return con.error('No output file specified');
 
-console.log(args[0], args[1]);
-
 var p = App.readFile(args[0] + '/package.prm')
 
 if(!p)
@@ -50,6 +48,11 @@ if(typeof(p.permissions) !== 'object')
 if(!p.permissions.storage)
 	p.permissions.storage = [];
 
+var files = App.readDirFiles(args[0]);
+
+if(!files)
+	return con.error('Cannot read application directory');
+
 var app = App.readFile(args[0] + '/app.js');
 var cmd = App.readFile(args[0] + '/cmd.js');
 var uninstaller = App.readFile(args[0] + '/uninstaller.js');
@@ -63,15 +66,15 @@ if(!cmd)
 if(!uninstaller)
 	con.warn('No uninstaller found, the system will use the default uninstaller.');
 
-p.files = {
-	"app.js": app
+var pf = {};
+
+for(var i in files) {
+	pf[files[i]] = App.readFile(args[0] + '/' + files[i])
+	if(pf[i] === false)
+		return con.error('Cannot read application file [' + files[i] + ']');
 }
 
-if(cmd)
-	p.files["cmd.js"] = cmd;
-
-if(uninstaller)
-	p.files["uninstaler.js"] = uninstaller;
+p.files = pf;
 
 if(!App.writeFile(args[1], JSON.stringify(p)))
 	return con.error('Application has been packed but cannot write in the output file [' + args[1] + ']');
