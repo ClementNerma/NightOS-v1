@@ -95,11 +95,21 @@
 						}
 
 						catch(e) {
-							throw new Error('Unable to evaluate ' + j + ' file [' + file + '] file. Make sure that this directory is readable<br /><br />Details :<br /><br />' + e.message + '');
+							throw new Error('Unable to evaluate ' + j + ' file [' + file + '] file. Make sure that this directory is readable<br /><br />Details :<br /><br />' + new String(e) + '');
 
 							break boot;
 						}
 					}
+
+				try {
+					var ini = window.ini = require(Core.path.root + '/external-tools/ini.js');
+					Object.freeze(ini);
+				}
+
+				catch(e) {
+					throw new Error('Cannot load ini module [external-tools/ini]<br /><br />Details :<br /><br />' + new String(e))
+					break boot;
+				}
 
 				var app = fs.readFileSync(directory + '/app.js', 'utf8');
 

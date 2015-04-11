@@ -1,22 +1,21 @@
 
 if(!args[0])
-	return con.error('No input file specified');
+	return con.error('No input directory specified');
 
 if(!args[1])
 	return con.error('No output file specified');
 
-var p = App.readFile(args[0]);
+var p = App.readFile(args[0] + '/package.prm')
 
 if(!p)
-	return con.error('Specified file is not accessible or doesn\'t exists');
+	return con.error('package.prm is not accessible or doesn\'t exists');
 
 try {
 	p = JSON.parse(p);
 }
 
 catch(e) {
-	console.log(p);
-	return con.error('The input file is not a valid JSON file');
+	return con.error('The package.prm file is not a valid JSON file');
 }
 
 if(!p.name)
@@ -49,9 +48,9 @@ if(typeof(p.permissions) !== 'object')
 if(!p.permissions.storage)
 	p.permissions.storage = [];
 
-var app = App.readFile('app.js');
-var cmd = App.readFile('cmd.js');
-var uninstaller = App.readFile('uninstaller.js');
+var app = App.readFile(args[0] + '/app.js');
+var cmd = App.readFile(args[0] + '/cmd.js');
+var uninstaller = App.readFile(args[0] + '/uninstaller.js');
 
 if(!app)
 	return con.error('Cannot read main application file [app.js]');

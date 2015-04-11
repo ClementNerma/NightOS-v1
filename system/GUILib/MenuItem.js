@@ -5,6 +5,7 @@ var MenuItem = function(text, callback) {
 	var _visible = true;
 	var _items = [];
 	var _DOM = document.createElement('span');
+	var _click;
 
 	/**
 	  * Change the label of the item
@@ -84,10 +85,14 @@ var MenuItem = function(text, callback) {
 
 		_enabled = enabled;
 
-		if(enabled)
+		if(enabled) {
 			_DOM.setAttribute('enabled', 'true');
-		else
+			this.setClick(_click);
+		} else {
+			_click = this.click();
 			_DOM.removeAttribute('enabled');
+			this.setClick(function() {});
+		}
 
 	}
 

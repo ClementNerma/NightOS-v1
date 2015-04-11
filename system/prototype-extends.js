@@ -70,7 +70,7 @@ String.prototype.escapeHTML = function() {
 		'&':'&amp;',
 		'<':'&lt;',
 		'>':'&gt;',
-		'"':'&quote;',
+		'"':'&quot;',
 		"'":'&#039;'
 	};
 

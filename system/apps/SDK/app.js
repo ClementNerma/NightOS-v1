@@ -1,247 +1,261 @@
 
-//var explorer = require.library('Explorer');
+/* Define SDK functions */
 
-function newFile() {
+function enableMenu(bool) {
 
-	Dialogs.dialog('Save changes ?', 'The file ' + file + ' has been edited.<br />Do you want to save it ?<br />Note : All not saved modifications will be definitively lost.', {
+	_new.setEnabled    (bool);
+	_open.setEnabled   (bool);
+	_save.setEnabled   (bool);
+	_saveAs.setEnabled (bool);
+	_quit.setEnabled   (bool);
+	_build.setEnabled  (bool);
 
-		'Save': function() {
-			saveFile();
-			$('#editor').val('');
-			name = null;
-			file = null;
-			changes = false;
-			WinGUI.setTitle('NightOS SDK');
-			Dialogs.close();
-		},
+}
 
-		'Do not save': function() {
-			$('#editor').val('');
-			name = null;
-			file = null;
-			changes = false;
-			WinGUI.setTitle('NightOS SDK');
-			Dialogs.close();
-		},
+function openProject(path) {
 
-		'Cancel': function() {
-			Dialogs.close();
-		}
+	if(!App.directoryExists(path))
+		return Dialogs.error('SDK - Can\'t open project', 'Unable to open project because the project path doesn\'t exists [' + path + ']');
+
+	var _pkg = App.readFile(path + '/package.prm');
+	var _app = App.readFile(path + '/app.js');
+	var _cmd = App.readFile(path + '/cmd.js');
+	var _uninstaller = App.readFile(path + '/uninstaller.js');
+
+	if(!_pkg)
+		return Dialogs.error('SDK - Error', 'Missing package.prm file');
+
+	if(!_app)
+		return Dialogs.error('SDK - Error', 'Missing app.js file');
+
+	$('#projects').hide();
+	$('#editor').show();
+	$('#panel').html('<div>package.prm</div><div>app.js</div>' + (_cmd ? '<div>cmd.js</div>' : '') + (_uninstaller ? '<div>uninstaller.js</div>' : ''));
+	$('#panel div').click(function() {
+		openFile(proj + '/' + this.innerHTML);
+	});
+	$('#panel').show();
+
+	editor.refresh();
+	proj = path;
+	enableMenu(true);
+
+}
+
+function confirmContinue(yes, no, cancel) {
+
+	return Dialogs.dialog('SDK', 'The file has been edited. Do you want to save it ?<br /><br />' + proj + '/' + file, {
+
+		Save: yes,
+		'Do not save': no,
+		Cancel: cancel
 
 	});
 
 }
 
-function openFile() {
+function newFile(force) {
 
-	/*explorer.openFile('Open a file...', function(file) {
-		if(!openFileCallback(file))
-			return Dialogs.error('NightOS SDK', 'Cannot open ' + file + '. Please check that this file exists and is readable.');
-	},  ['*.txt']);*/
-
-	if(changes)
-		Dialogs.dialog('Save changes ?', 'The file ' + file + ' has been edited.<br />Do you want to save it ?<br />Note : All not saved modifications will be definitively lost.', {
-
-			'Save': function() {
-				saveFile();
-				openFile();
-			},
-
-			'Do not save': function() {
-				App.quit();
-			},
-
-			'Cancel': function() {
-				Dialogs.close();
-			}
-
-		});
-	else
-		Dialogs.input('Open a file...', 'Please specify the location of the file :', 'text', function(file) {
-
-			if(!openFileCallback(file))
-				Dialogs.error('NightOS SDK', 'Cannot open ' + file + '. Please check that this file exists and is readable.');
-			else
-				Dialogs.info('NightOS SDK', 'Sucessfull !');
-
+	if(changes && !force)
+		return confirmContinue(function() {
+			saveFile()
+			newFile(true);
+			Dialogs.close();
+		}, function() {
+			newFile(true);
+			Dialogs.close();
+		}, function() {
+			Dialogs.close();
 		});
 
-}
-
-function openFileCallback(path) {
-
-	var content = App.readFile(path);
-
-	if(content === false)
-		return false;
-
-	file = path;
-	name = path.split('/')[path.split('/').length - 1]
-
-	WinGUI.setTitle('NightOS SDK - ' + name);
-	$('#editor').val(content);
-
-	language = (Registry.read('filesys/' + Explorer.fileExtension(file) + '/language') || 'plain')
-	editor.input();
+	file = false;
 	changes = false;
+	lang = 'plain';
 
-	return true;
+	editor.setContent('');
 
 }
 
-function saveFile() {
+function openFile(name, force) {
+
+	n = name;
+
+	if(changes && !force)
+		return confirmContinue(function() {
+			saveFile();
+			openFile(n, true);
+			Dialogs.close();
+		}, function() {
+			openFile(n, true);
+			Dialogs.close();
+		}, function() {
+			Dialogs.close();
+		})
+
+	var f = App.readFile(name);
+
+	if(!f)
+		return Dialogs.error('SDK', 'Can\'t open ' + name + ' file');
+
+	file = name;
+	lang = (Registry.read('filesys/' + Explorer.fileExtension(name) + '/language') || 'plain');
+	editor.setContent(f);
+	editor.setHTML(Syntax.highlight(f, lang));
+
+}
+
+function saveFile(callback) {
+
+	c = callback;
 
 	if(!changes)
 		return true;
 
 	if(file) {
-		language = (Registry.read('filesys/' + Explorer.fileExtension(file) + '/language') || 'plain')
-		editor.input();
-		changes = App.writeFile(file, $('#editor').val()) ? false : !Dialogs.error('NightOS SDK', 'Cannot save ' + file + '.');
-		return changes;
- 	} else
-		return saveAsFile();
+		if(!App.writeFile(file))
+			Dialogs.error('SDK - Write failed', 'Cannot write ' + file + ' file.' + (App.lastStack(-1) ? '<br />Needs privileges elevation' : ''));
+		else {
+			c();
+			changes = false;
+		}
+	} else
+		saveAsFile(callback);
 
 }
 
-function saveAsFile() {
+function saveAsFile(callback) {
 
-	Dialogs.input('NightOS SDK - Save As...', 'Please input the file path :', 'text', function(path) {
+	c = callback;
 
-		file = path;
-		name = file.split('/')[file.split('/').length - 1];
+	return Dialogs.input('SDK - Save as...', 'Please input the file path :', 'text', function(val) {
 
-		saveFile();
+		file = val;
+		saveFile(c);
 
 	});
 
 }
 
-function build() {
+function quitFile(force) {
 
-	if(changes)
-		return Dialogs.alert('NightOS SDK - Build...', 'You must save changes before build your application.');
+	if(changes && !force)
+		return confirmContinue(function() {
+			saveFile()
+			quitFile(true);
+			Dialogs.close();
+		}, function() {
+			quitFile(true);
+			Dialogs.close();
+		}, function() {
+			Dialogs.close();
+		});
 
-	Dialogs.confirm('NightOS SDK - Build...', 'Do you want to build your application with the following informations :<br /><br /><table noborder><tr><td>Editor</td><td>' + inf.creator + '</td></tr><tr><td>Version</td><td>' + inf.version + '</td></tr><tr><td>App. name</td><td>' + inf.name + '</td></tr></table>', function() {
+	Dialogs.confirm('SDK - Quit', 'Do you really want to close the SDK ?', function() {
 
-		$('#build-log').html('').show();
-		App.writeFile('/users/$USER$/tmp/sdk/package.prm', JSON.stringify(inf))
-		App.copyFile(file, '/users/$USER$/tmp/sdk/app.js');
-		Core.commandLine.exec('chdir /users/$USER$/tmp/sdk && make package.prm package.app', con);
+		App.quit();
 
-	}, function() {
-		Dialogs.alert('NightOS SDK - Build canceled', 'Please change the following informations in the <b>Build</b> menu.');
+	});
+
+}
+
+function buildApp() {
+
+	$('#build-log').show();
+	buildError = false;
+	Core.commandLine.exec('make "' + proj + '" "' + proj + '/package.app"', con);
+
+}
+
+function openBuiltApp() {
+
+	Core.applications.launch('Explorer', {
+		openFile: proj,
+		origin: 'SDK',
+		from: App.name
 	})
 
 }
 
-var open = App.call.arguments.openFile;
+/* Get the projects list */
 
-var file = null;
-var name = null;
-var theme = 'default';
-var language = 'plain';
+var p_ini = App.readFile('/users/$USER$/appdata/SDK/projects.ini');
 
-var changes = false;
+if(!p_ini)
+	p_ini = {};
+else
+	p_ini = ini.parse(p_ini).projects;
 
 App.loadFrame('UI');
 
-$('#build-log').hide();
+$('#editor, #build-log, #panel').hide();
 
-var fileMenu = new MenuElement('File');
+for(var i in p_ini)
+	$('#projects').append($(document.createElement('div')).text(i).click(function() {
+		openProject(p_ini[this.innerText]);
+	}));
 
-var _newFile = new MenuItem('New', newFile);
-var _openFile = new MenuItem('Open', openFile);
-var _saveFile = new MenuItem('Save', saveFile);
-var _saveAsFile = new MenuItem('Save as...', saveAsFile);
-var _quitFile = new MenuItem('Quit', App.events.on('quit'));
+/* Define SDK variables */
 
-fileMenu.addItem(_newFile);
-fileMenu.addItem(_openFile);
-fileMenu.addItem(_saveFile);
-fileMenu.addItem(_saveAsFile);
-fileMenu.addItem(_quitFile);
+var proj; // the project directory (ex: /users/admin/documents/Hello World)
+var file; // the current file name (ex: app.js)
+var lang; // the language sheet to use (ex: javascript)
+var changes = false;
+var n, c;
 
-var buildMenu = new MenuElement('Build');
-
-var buildBuild = new MenuItem('Build...', build);
-
-menuBar.addElement(fileMenu);
-menuBar.addElement(buildMenu);
-
-menuBar.setVisible(true);
+/* Create SDK editor */
 
 var editor = new UnderEdit($('#editor'));
-
-editor.keydown(function(e) {
-
-	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'O')
-		return openFile();
-
-	if(e.ctrlKey && e.shiftKey && String.fromCharCode(e.keyCode) === 'S')
-		return saveAsFile();
-
-	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'S')
-		return saveFile();
-
-	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'Q')
-		return App.events.on('quit')();
-
-	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'N')
-		newFile();
-
-	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'B')
-		build();
-
-});
 
 editor.input(function() {
 
 	changes = true;
-	editor.setHTML(Syntax.highlight(editor.content(), language, theme))
+	editor.setHTML(Syntax.highlight(editor.content(), lang));
 
 });
 
-App.events.on('quit', function() {
+/* Create SDK build log */
 
-	if(changes)
-		Dialogs.dialog('Save changes ?', 'The file ' + file + ' has been edited.<br />Do you want to save it ?<br />Note : All not saved modifications will be definitively lost.', {
+var buildError;
+var con = new Console($('#build-log'), false, true);
 
-			'Save': function() {
-				saveFile();
-				App.quit();
-			},
+con.on('error', function() {
 
-			'Do not save': function() {
-				App.quit();
-			},
-
-			'Cancel': function() {
-				Dialogs.close();
-			}
-
-		});
-	else
-		App.quit();
+	buildError = true;
 
 });
 
-if(open && !openFileCallback(open))
-	Dialogs.error('Cannot open ' + open);
+con.on('invite', function() {
 
-var con = new Console($('#build-log'));
+	con.write('<br /><div id="build-log-closer" OnClick="$(\'#build-log\').hide().html(\'\')">Close</div>' + (buildError ? '' : ' <div id="build-log-opener" OnClick="openBuiltApp();">Open app folder</div>'));
 
-var inf = {
-	name: 'MyFirstApplication',
-	creator: 'Me',
-	version: '1.0',
-	icon: 'no-icon',
+});
 
-	permissions: {
-		storage: []
-	},
+/* Create GUI */
 
-	access: [],
+var menuBar = new MenuBar();
+menuBar.setVisible(true);
 
-	rights: 1
-}
+var fileMenu = new MenuElement('File');
+var _new = new MenuItem('New', newFile);
+var _open = new MenuItem('Open', openFile);
+var _save = new MenuItem('Save', saveFile);
+var _saveAs = new MenuItem('Save as...', saveAsFile);
+var _quit = new MenuItem('Quit', quitFile);
+
+var buildMenu = new MenuElement('Build');
+var _build = new MenuItem('Build application...', buildApp);
+
+enableMenu(false);
+
+fileMenu.addItem(_new);
+fileMenu.addItem(_open);
+fileMenu.addItem(_save);
+fileMenu.addItem(_saveAs);
+fileMenu.addItem(_quit);
+
+buildMenu.addItem(_build);
+
+menuBar.addElement(fileMenu);
+menuBar.addElement(buildMenu);
+
+GUI.setMenuBar(menuBar);

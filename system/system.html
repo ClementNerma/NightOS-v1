@@ -69,11 +69,21 @@
 					}
 
 					catch(e) {
-						fatalError('Unable to evaluate ' + j + ' file [' + file + '] file. Make sure that this directory is readable<br /><br />Details :<br /><br />' + e.message + '');
+						fatalError('Unable to evaluate ' + j + ' file [' + file + '] file. Make sure that this directory is readable<br /><br />Details :<br /><br />' + new String(e) + '');
 
 						break boot;
 					}
 				}
+
+			try {
+				var ini = require(Core.path.root + '/external-tools/ini.js');
+				Object.freeze(ini);
+			}
+
+			catch(e) {
+				fatalError('Cannot load ini module [external-tools/ini]<br /><br />Details :<br /><br />' + new String(e))
+				break boot;
+			}
 
 			delete boot;
 			delete files;

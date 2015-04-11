@@ -1114,7 +1114,7 @@ var Core = new function() {
 
 			con.noinvite();
 
-			var args = cmd.trim().replace(/ "(.*?)"/g, "\n$1").split("\n");
+			var args = cmd.trim().replace(/(^| )"(.*?)"/g, "\n$1").split("\n");
 			var n = args[0];
 
 			args.splice(0, 1);

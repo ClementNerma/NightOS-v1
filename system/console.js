@@ -18,15 +18,24 @@ var Consoles = new function() {
   * @param {Boolean} setDefaultInvite
   */
 
-var Console = function(context, setDefaultInvite) {
+var Console = function(context, setDefaultInvite, readOnly) {
 
-	var _console = $(context)[0];
-	var _prompt  = '$' + String.fromCharCode(160);
-	var _id      = Consoles.inc();
-	var _history = [];
-	var _start   = null;
-	var _invite  = false;
-	var _h       = false;
+	var _console  = $(context)[0];
+	var _prompt   = '$' + String.fromCharCode(160);
+	var _id       = Consoles.inc();
+	var _history  = [];
+	var _start    = null;
+	var _invite   = false;
+	var _readOnly = false;
+	var _h        = false;
+	var _events   = {
+		write: function() {},
+		warn: function() {},
+		error: function() {},
+		clear: function() {},
+		'no-invite': function() {},
+		invite: function() {}
+	};
 
 	Consoles.add(this, _id);
 
@@ -76,24 +85,28 @@ var Console = function(context, setDefaultInvite) {
 	this.write = function(text, noJump) {
 
 		_console.innerHTML += (noJump ? '' : '<br />') + text;
+		this.on('write')(text);
 
 	}
 
 	this.text = function(text, noJump) {
 
 		_console.innerHTML += (noJump ? '' : '<br />') + text.escapeHTML().replace(/ /g, String.fromCharCode(160)).replace(/\n/g, '<br/>');
+		this.on('write')(text);
 
 	}
 
 	this.warn = function(text, noJump) {
 
 		_console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: yellow;">' + text + '</span>';
+		this.on('warn')(text);
 
 	}
 
 	this.error = function(text, noJump) {
 
 		_console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: red;">' + text + '</span>';
+		this.on('warn')(text);
 		return false;
 
 	}
@@ -101,47 +114,56 @@ var Console = function(context, setDefaultInvite) {
 	this.clear = function(text) {
 
 		_console.innerHTML = '';
+		this.on('clear')();
 
 	}
 
 	this.noinvite = function() {
+
 		_invite = false;
+		this.on('no-invite')();
+
 	}
 
 	this.invite = function() {
 
-		_invite = true;
-		_console.innerHTML += '<br /><br /><span style="color: #50E8A0;">' + Core.path.chdir().escapeHTML() + '</span><br />' + _prompt + '<div class="cmd" contenteditable="true"></div>';
-		_console.lastChild.style.display = 'inline-block';
-		_console.lastChild.style.outline = 'none';
-		_console.lastChild.focus();
+		if(!_readOnly) {
+			_invite = true;
+			_console.innerHTML += '<br /><br /><span style="color: #50E8A0;">' + Core.path.chdir().escapeHTML() + '</span><br />' + _prompt + '<div class="cmd" contenteditable="true"></div>';
+			_console.lastChild.style.display = 'inline-block';
+			_console.lastChild.style.outline = 'none';
+			_console.lastChild.focus();
+		}
+
+		this.on('invite')(_readOnly);
 
 	}
 
-	/*this.placeCaretAtEnd = function() {
+	this.on = function(name, callback) {
 
-		var range = document.createRange();
-        range.selectNodeContents(_console);
-        range.collapse(false);
-        var sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
+		if(typeof(callback) === 'function')
+		 	_events[name] = callback;
+
+		return _events[name];
 
 	}
 
-	this.getCaretPosition = function() {
-	   
-	   var caretOffset = 0;
-	   var range = window.getSelection().getRangeAt(0);
-       var preCaretRange = range.cloneRange();
-       preCaretRange.selectNodeContents(_console);
-       preCaretRange.setEnd(range.endContainer, range.endOffset);
-       return preCaretRange.toString().length;
+	this.setReadOnly = function(bool) {
 
-	}*/
+		_readOnly = bool;
+
+	}
+
+	this.readOnly = function() {
+
+		return _readOnly;
+
+	}
 
 	if(setDefaultInvite)
 		this.invite();
+
+	_readOnly = readOnly;
 
 }
 

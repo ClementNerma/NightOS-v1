@@ -1,0 +1,13 @@
+{
+	"name": "MyFirstApplication",
+	"version": "1.0",
+	"creator": "Anonymous",
+	"icon": "default",
+	"rights": 2,
+
+	"permissions": {
+		"storage": ["read_dir", "read_file"]
+	},
+
+	"access": ["/users/$USER$/documents"]
+}

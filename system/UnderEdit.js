@@ -65,7 +65,9 @@ var UnderEdit = function(context, width, height) {
 
 	this.setHTML = function(content) {
 
+		console.log(content);
 		underground.html(content);
+		console.log(underground.html())
 
 	}
 
