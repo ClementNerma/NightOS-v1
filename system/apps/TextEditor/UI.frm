@@ -5,7 +5,7 @@
 
 #editor {
 	position: absolute;
-	top: 0;
+	top: 25px;
 	left: 0;
 	right: 0;
 	bottom: 25px;

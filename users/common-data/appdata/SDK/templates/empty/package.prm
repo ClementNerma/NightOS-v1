@@ -1,0 +1,11 @@
+{
+	"name": "MyOwnApplication",
+	"version": "1.0",
+	"creator": "Anonymous",
+	"icon": "default",
+	"rights": 2,
+
+	"permissions": {},
+
+	"access": []
+}

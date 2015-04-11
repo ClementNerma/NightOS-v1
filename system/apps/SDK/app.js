@@ -12,6 +12,66 @@ function enableMenu(bool) {
 
 }
 
+function createProject(template, location) {
+
+	if(!template) {
+		var tpl = App.readSubDirs('/users/common-data/appdata/SDK/templates');
+
+		if(!tpl)
+			return Dialogs.error('SDK', 'Cannot load SDK project templates');
+
+		$('#loc-input').hide();
+		$('#new-project').show();
+
+		for(var i in tpl)
+			$('#templates').append($(document.createElement('div')).text(tpl[i]).click(function() {
+				this.className = 'selected';
+				createProject(this.innerText);
+			}));
+
+	} else if(!location) {
+
+		$('#loc-input').slideDown(1000);
+		$('#loc-input button').click(function() {
+
+			createProject($('#templates .selected').text(), $('#loc').val());
+
+		});
+
+	} else {
+
+		if(App.directoryExists(location))
+			return Dialogs.error('SDK - Cannot create project', 'This folder already exists. Please specify a non-existant path.');
+
+		if(!App.makeDir(location))
+			return Dialogs.error('SDK - Cannot make specified folder' + (App.lastStack(-1) ? '<br />Needs privileges elevation' : ''));
+
+		var tpl_loc = '/users/common-data/appdata/SDK/templates/' + template;
+
+		var files = App.readDir(tpl_loc);
+
+		if(!files)
+			return Dialogs.error('SDK - Cannot read template folder', 'Cannot read <b>' + template + '</b> template folder');
+
+		var copy_err = [];
+
+		for(var i in files)
+			if(!App.copyFile(tpl_loc + '/' + files[i], location))
+				copy_err.push(files[i]);
+
+		if(copy_err.length)
+			Dialogs.error('SDK - Cannot copy template files', 'The following files has not been copied to the project folder :<br /><br />' + copy_err.join('<br />') + '<br /><br />');
+		else {
+			location = Core.path.format(location).replace(Core.path.format, '').replace(/\/$/g, '');
+			p_ini[location.split('/')[location.split('/').length - 1]] = location;
+			App.writeFile('/users/$USER$/appdata/SDK/projects.ini', ini.encode({projects:p_ini}));
+			openProject(location);
+		}
+
+	}
+
+}
+
 function openProject(path) {
 
 	if(!App.directoryExists(path))
@@ -28,7 +88,7 @@ function openProject(path) {
 	if(!_app)
 		return Dialogs.error('SDK - Error', 'Missing app.js file');
 
-	$('#projects').hide();
+	$('#projects, #new-project').remove();
 	$('#editor').show();
 	$('#panel').html('<div>package.prm</div><div>app.js</div>' + (_cmd ? '<div>cmd.js</div>' : '') + (_uninstaller ? '<div>uninstaller.js</div>' : ''));
 	$('#panel div').click(function() {
@@ -44,7 +104,7 @@ function openProject(path) {
 
 function confirmContinue(yes, no, cancel) {
 
-	return Dialogs.dialog('SDK', 'The file has been edited. Do you want to save it ?<br /><br />' + proj + '/' + file, {
+	return Dialogs.dialog('SDK', 'The file has been edited. Do you want to save it ?<br /><br />' + file, {
 
 		Save: yes,
 		'Do not save': no,
@@ -54,15 +114,15 @@ function confirmContinue(yes, no, cancel) {
 
 }
 
-function newFile(force) {
+function newFile(e, force) {
 
 	if(changes && !force)
 		return confirmContinue(function() {
 			saveFile()
-			newFile(true);
+			newFile(undefined, true);
 			Dialogs.close();
 		}, function() {
-			newFile(true);
+			newFile(undefined, true);
 			Dialogs.close();
 		}, function() {
 			Dialogs.close();
@@ -77,6 +137,13 @@ function newFile(force) {
 }
 
 function openFile(name, force) {
+
+	if(typeof(name) !== 'string')
+		return Dialogs.input('SDK - Open...', 'Please input the file path :', 'text', function(val) {
+
+			openFile(val);
+
+		});
 
 	n = name;
 
@@ -97,6 +164,7 @@ function openFile(name, force) {
 	if(!f)
 		return Dialogs.error('SDK', 'Can\'t open ' + name + ' file');
 
+	changes = false;
 	file = name;
 	lang = (Registry.read('filesys/' + Explorer.fileExtension(name) + '/language') || 'plain');
 	editor.setContent(f);
@@ -106,13 +174,14 @@ function openFile(name, force) {
 
 function saveFile(callback) {
 
-	c = callback;
+	if(typeof(callback) === 'function')
+		c = callback;
 
 	if(!changes)
 		return true;
 
 	if(file) {
-		if(!App.writeFile(file))
+		if(!App.writeFile(file, editor.content()))
 			Dialogs.error('SDK - Write failed', 'Cannot write ' + file + ' file.' + (App.lastStack(-1) ? '<br />Needs privileges elevation' : ''));
 		else {
 			c();
@@ -125,7 +194,8 @@ function saveFile(callback) {
 
 function saveAsFile(callback) {
 
-	c = callback;
+	if(typeof(callback) === 'function')
+		c = callback;
 
 	return Dialogs.input('SDK - Save as...', 'Please input the file path :', 'text', function(val) {
 
@@ -136,15 +206,15 @@ function saveAsFile(callback) {
 
 }
 
-function quitFile(force) {
+function quitFile(e, force) {
 
 	if(changes && !force)
 		return confirmContinue(function() {
 			saveFile()
-			quitFile(true);
+			quitFile(undefined, true);
 			Dialogs.close();
 		}, function() {
-			quitFile(true);
+			quitFile(undefined, true);
 			Dialogs.close();
 		}, function() {
 			Dialogs.close();
@@ -180,19 +250,25 @@ function openBuiltApp() {
 
 var p_ini = App.readFile('/users/$USER$/appdata/SDK/projects.ini');
 
-if(!p_ini)
+if(!p_ini) {
+	App.makeDir('/users/$USER$/appdata/SDK');
+	App.writeFile('/users/$USER$/appdata/SDK/projects.ini', '[projects]');
 	p_ini = {};
-else
+} else
 	p_ini = ini.parse(p_ini).projects;
 
 App.loadFrame('UI');
 
-$('#editor, #build-log, #panel').hide();
+$('#editor, #build-log, #panel, #new-project').hide();
 
 for(var i in p_ini)
 	$('#projects').append($(document.createElement('div')).text(i).click(function() {
 		openProject(p_ini[this.innerText]);
 	}));
+
+$('#projects').append($(document.createElement('div')).text('Create a new project...').click(function() {
+	createProject();
+}));
 
 /* Define SDK variables */
 
@@ -232,18 +308,19 @@ con.on('invite', function() {
 
 /* Create GUI */
 
+delete menuBar;
 var menuBar = new MenuBar();
 menuBar.setVisible(true);
 
 var fileMenu = new MenuElement('File');
-var _new = new MenuItem('New', newFile);
-var _open = new MenuItem('Open', openFile);
-var _save = new MenuItem('Save', saveFile);
-var _saveAs = new MenuItem('Save as...', saveAsFile);
-var _quit = new MenuItem('Quit', quitFile);
+var _new     = new MenuItem('New', newFile);
+var _open    = new MenuItem('Open', openFile);
+var _save    = new MenuItem('Save', saveFile);
+var _saveAs  = new MenuItem('Save as...', saveAsFile);
+var _quit    = new MenuItem('Quit', quitFile);
 
 var buildMenu = new MenuElement('Build');
-var _build = new MenuItem('Build application...', buildApp);
+var _build    = new MenuItem('Build application...', buildApp);
 
 enableMenu(false);
 
@@ -259,3 +336,7 @@ menuBar.addElement(fileMenu);
 menuBar.addElement(buildMenu);
 
 GUI.setMenuBar(menuBar);
+
+/* Set application events */
+
+App.events.on('quit', quitFile);

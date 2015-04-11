@@ -88,11 +88,19 @@ Certificate.prototype.hasAccess = function(path, isRead) {
 	if(System.requireRights(path, isRead) > this.rights)
 		return false;
 
-	for(var i in this.access)
-		if(!Core.path.included(path, this.access[i]))
-			return false;
+	if(isRead) {
+		var readableDirs = Registry.read('system/storage/readable');
 
-	return true;
+		for(var i in readableDirs)
+			if(Core.path.included(path, readableDirs[i]))
+				return true;
+	}
+
+	for(var i in this.access)
+		if(Core.path.included(path, this.access[i]))
+			return true;
+
+	return false;
 
 }
 

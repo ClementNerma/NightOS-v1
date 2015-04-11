@@ -5,6 +5,8 @@ if(!args[0])
 if(!args[1])
 	return con.error('No output file specified');
 
+console.log(args[0], args[1]);
+
 var p = App.readFile(args[0] + '/package.prm')
 
 if(!p)

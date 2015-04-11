@@ -29,6 +29,8 @@
 				frame.innerHTML = '<p>' + err + '</p>';
 			});
 
+			Object.freeze(window.sys);
+
 			window.WinGUI = WinGUI;
 			var appLauncherRootPath = window.appLauncherRootPath = root;
 
@@ -55,16 +57,16 @@
 				window.app_name = name;
 
 				try {
-					if(fs.lstatSync(root + '/system/apps/' + name).isDirectory())
+					if(fs.existsSync(root + '/system/apps/' + name) && fs.lstatSync(root + '/system/apps/' + name).isDirectory())
 						var directory = root + '/system/apps/' + name;
-					else if(fs.lstatSync(root + '/apps/' + name).isDirectory())
+					else if(fs.existsSync(root + '/apps/' + name) && fs.lstatSync(root + '/apps/' + name).isDirectory())
 						var directory = root + '/apps/' + name;
 					else
 						throw new Error('Application not found [' + name + ']');
 				}
 
 				catch(e) {
-					throw new Error('Application not found [' + name + ']')
+					throw new Error('An error occured :<br /><br />' + new String(e));
 				}
 
 				window.directory = directory;

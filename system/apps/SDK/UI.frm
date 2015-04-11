@@ -1,12 +1,19 @@
 
 <div id="projects"></div>
+<div id="new-project">
+	<div id="templates"></div>
+	<div id="loc-input">
+		<input type="text" id="loc" value="" placeholder="Specify the project location..." /><br />
+		<button>Create project</button>
+	</div>
+</div>
 <div id="panel"></div>
 <textarea id="editor"></textarea>
 <div id="build-log"></div>
 
 <style type="text/css">
 
-#editor, #projects {
+#projects, #new-project, #editor {
 	position: absolute;
 	top: 25px;
 	left: 0;
@@ -15,6 +22,10 @@
 	width: 100%;
 	outline: none;
 	border: 1px solid black;
+}
+
+#projects, #new-project {
+	background-color: #524F52;
 }
 
 #editor {
@@ -81,14 +92,14 @@ body {
 
 }
 
-#projects div {
+#projects div, #templates div {
 
 	border: 1px solid gray;
 	padding: 5px;
 
 }
 
-#projects div:hover {
+#projects div:hover, #templates div:hover, #templates .selected {
 
 	background-color: #D4D4D4;
 	cursor: pointer;

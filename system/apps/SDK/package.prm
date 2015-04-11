@@ -8,6 +8,6 @@
 		"storage": ["*"]
 	},
 
-	"access": ["/*"],
+	"access": ["/users/$USER$/"],
 	"rights": "herit<3"
 }

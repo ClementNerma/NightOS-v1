@@ -436,18 +436,16 @@ var Core = new function() {
 
 				}
 
-				this.contentWindow.quitApp = function(name, frame_ID) {
+				this.contentWindow.sys = {
+					quitApp: function(name, frame_ID) {
+						return Core.applications.close(name, frame_ID);
+					},
 
-					return Core.applications.close(name, frame_ID);
-
-				}
-
-				this.contentWindow.appError = function(message, file, line, col, error, win) {
-
-					Dialogs.error('Application chrashed !', 'The ' + win.App.name + ' application crashed !<br /><br />Details :<br /><br /><span style="color: red;">' + message + '</span><br /><br />app-launcher:' + line + ',' + col);
-					Core.applications.close(win.App.name, win.App.ID)
-
-					//write error in log
+					appError: function(message, file, line, col, error, win) {
+						Dialogs.error('Application chrashed !', 'The ' + win.App.name + ' application crashed !<br /><br />Details :<br /><br /><span style="color: red;">' + message + '</span><br /><br />app-launcher:' + line + ',' + col);
+						Core.applications.close(win.App.name, win.App.ID)
+						// write error in log
+					}
 
 				}
 
@@ -1114,7 +1112,7 @@ var Core = new function() {
 
 			con.noinvite();
 
-			var args = cmd.trim().replace(/(^| )"(.*?)"/g, "\n$1").split("\n");
+			var args = cmd.trim().replace(/ "(.*?)"/g, "\n$1").split("\n");
 			var n = args[0];
 
 			args.splice(0, 1);
@@ -1401,8 +1399,8 @@ process.on('uncaughtException', function(e) {
 window.onerror = function(message, file, line, col, error) {
 
 	if(error.stack.contains('/system/app-launcher/launcher.html'))
-		if(typeof(appLauncher) !== 'undefined' && typeof(appError) !== 'undefined')
-			appError(message, file, line, col, error, window);
+		if(typeof(appLauncher) !== 'undefined' && typeof(sys) !== 'undefined' && sys.appError)
+			sys.appError(message, file, line, col, error, window);
 	else
 		console.error(message + "\n\n" + file + ':' + line + ',' + col + "\n\n" + error);
 

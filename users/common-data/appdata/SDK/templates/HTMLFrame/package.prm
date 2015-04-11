@@ -1,0 +1,13 @@
+{
+	"name": "MyOwnApplication",
+	"version": "1.0",
+	"creator": "Anonymous",
+	"icon": "default",
+	"rights": 2,
+
+	"permissions": {
+		"storage": ["load_frame"] // allow the application to load frames
+	},
+
+	"access": []
+}

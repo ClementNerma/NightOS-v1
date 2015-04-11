@@ -192,20 +192,20 @@ var Storage = new function() {
 
 		App.pushStack(0);
 
-		from = authorize('copyFile');
+		srcFile = authorize('copyFile', undefined, true);
 
-		if(!from) {
+		if(!srcFile) {
 			App.pushStack(-1);
 			return false;
 		}
 
-		if(!App.fileExists(from))
-			return Debug.error('The origin file doesn\'t exists', from);
+		if(!App.fileExists(srcFile))
+			return Debug.error('The origin file doesn\'t exists', srcFile);
 
 		destFile = Core.path.format(destFile);
 
 		if(App.directoryExists(destFile))
-			destFile = Core.path.format(destFile + '/' + from.split('/')[from.split('/').length - 1]);
+			destFile = Core.path.format(destFile + '/' + srcFile.split('/')[srcFile.split('/').length - 1]);
 
 		if(!_cert.hasAccess(destFile)) {
 			App.pushStack(-1);
@@ -488,7 +488,7 @@ var Storage = new function() {
 
 		App.pushStack(0);
 
-		var path = authorize('readDirFiles');
+		var path = authorize('readDirFiles', undefined, true);
 
 		if(!path) {
 			App.pushStack(-1);
@@ -496,17 +496,17 @@ var Storage = new function() {
 		}
 
 		if(!this.directoryExists(path))
-			return false;
+			return Debug.error('This directory doesn\'t exists');
 			//throw new Error('The path doesn\'t exists [' + path + ']');
 
 		try {
-			return fs.readdirSync(path).filter(function(e) {
-				return !fs.lstatSync(directory + '/' + e).isDirectory();
+			return fs.readdirSync(path).filter(function(f) {
+				return !fs.lstatSync(path + '/' + f).isDirectory();
 			});
 		}
 
 		catch(e) {
-			return false;
+			return Debug.error('Cannot read directory : ' + new String(e));
 		}
 
 	}
@@ -529,17 +529,17 @@ var Storage = new function() {
 		}
 
 		if(!this.directoryExists(path))
-			return false;
+			return Debug.error('This directory doesn\'t exists');
 			//throw new Error('The path doesn\'t exists [' + path + ']');
 
 		try {
-			return fs.readdirSync(path).filter(function(e) {
-				return fs.lstatSync(directory + '/' + e).isDirectory();
+			return fs.readdirSync(path).filter(function(f) {
+				return fs.lstatSync(path + '/' + f).isDirectory();
 			});
 		}
 
 		catch(e) {
-			return false;
+			return Debug.error('Cannot read directory : ' + new String(e));
 		}
 
 	}
@@ -555,7 +555,7 @@ var Storage = new function() {
 
 		App.pushStack(0);
 
-		if(!authorize('rename', true))
+		if(!authorize('rename'))
 			return false;
 
 		old_name = Core.path.format(old_name);

@@ -52,7 +52,7 @@ Application.prototype.getLauncher = function() { return this.app; }
   */
 
 Application.prototype.quit = function() {
-	return quitApp(window.App.name, window.App.ID);
+	return sys.quitApp(window.App.name, window.App.ID);
 }
 
 /* Frames */

@@ -1,167 +1,163 @@
 
-//var explorer = require.library('Explorer');
+function confirmContinue(yes, no, cancel) {
 
-function openFile() {
+	return Dialogs.dialog('Text Editor', 'The file has been edited. Do you want to save it ?<br /><br />' + file, {
 
-	/*explorer.openFile('Open a file...', function(file) {
-		if(!openFileCallback(file))
-			return Dialogs.error('Text Editor', 'Cannot open ' + file + '. Please check that this file exists and is readable.');
-	},  ['*.txt']);*/
-
-	if(changes)
-		Dialogs.dialog('Save changes ?', 'The file ' + file + ' has been edited.<br />Do you want to save it ?<br />Note : All not saved modifications will be definitively lost.', {
-
-			'Save': function() {
-				saveFile();
-				openFile();
-			},
-
-			'Do not save': function() {
-				App.quit();
-			},
-
-			'Cancel': function() {
-				Dialogs.close();
-			}
-
-		});
-	else
-		Dialogs.input('Open a file...', 'Please specify the location of the file :', 'text', function(file) {
-
-			if(!openFileCallback(file))
-				Dialogs.error('Text Editor', 'Cannot open ' + file + '. Please check that this file exists and is readable.');
-			else
-				Dialogs.info('Text Editor', 'Sucessfull !');
-
-		});
-
-}
-
-function openFileCallback(path) {
-
-	var content = App.readFile(path);
-
-	if(content === false)
-		return false;
-
-	file = path;
-	name = path.split('/')[path.split('/').length - 1]
-
-	WinGUI.setTitle('Text Editor - ' + name);
-	$('#editor').val(content);
-
-	return true;
-
-}
-
-function saveFile() {
-
-	if(!changes)
-		return true;
-
-	if(file) {
-		changes = App.writeFile(file, $('#editor').val()) ? true : Dialogs.error('Text Editor', 'Cannot save ' + file + '.');
-		return changes;
- 	} else
-		return saveAsFile();
-
-}
-
-function saveAsFile() {
-
-	Dialogs.input('Text Editor - Save As...', 'Please input the file path :', 'text', function(path) {
-
-		file = path;
-		name = file.split('/')[file.split('/').length - 1];
-
-		saveFile();
+		Save: yes,
+		'Do not save': no,
+		Cancel: cancel
 
 	});
 
 }
 
-var open = App.call.arguments.openFile;
+function newFile(e, force) {
 
-var file = null;
-var name = null;
+	if(changes && !force)
+		return confirmContinue(function() {
+			saveFile()
+			newFile(undefined, true);
+			Dialogs.close();
+		}, function() {
+			newFile(undefined, true);
+			Dialogs.close();
+		}, function() {
+			Dialogs.close();
+		});
 
+	file = false;
+	changes = false;
+
+	editor.val('');
+
+}
+
+function openFile(name, force) {
+
+	if(typeof(name) !== 'string')
+		return Dialogs.input('Text Editor - Open...', 'Please input the file path :', 'text', function(val) {
+
+			openFile(val);
+
+		});
+
+	n = name;
+
+	if(changes && !force)
+		return confirmContinue(function() {
+			saveFile();
+			openFile(n, true);
+			Dialogs.close();
+		}, function() {
+			openFile(n, true);
+			Dialogs.close();
+		}, function() {
+			Dialogs.close();
+		})
+
+	var f = App.readFile(name);
+
+	if(!f)
+		return Dialogs.error('Text Editor', 'Can\'t open ' + name + ' file');
+
+	changes = false;
+	file = name;
+	editor.val(f);
+
+}
+
+function saveFile(callback) {
+
+	if(typeof(callback) === 'function')
+		c = callback;
+
+	if(!changes)
+		return true;
+
+	if(file) {
+		if(!App.writeFile(file, editor.val()))
+			Dialogs.error('Text Editor - Write failed', 'Cannot write ' + file + ' file.' + (App.lastStack(-1) ? '<br />Needs privileges elevation' : ''));
+		else {
+			c();
+			changes = false;
+		}
+	} else
+		saveAsFile(callback);
+
+}
+
+function saveAsFile(callback) {
+
+	if(typeof(callback) === 'function')
+		c = callback;
+
+	return Dialogs.input('Text Editor - Save as...', 'Please input the file path :', 'text', function(val) {
+
+		file = val;
+		saveFile(c);
+
+	});
+
+}
+
+function quitFile(e, force) {
+
+	if(changes && !force)
+		return confirmContinue(function() {
+			saveFile()
+			quitFile(undefined, true);
+			Dialogs.close();
+		}, function() {
+			quitFile(undefined, true);
+			Dialogs.close();
+		}, function() {
+			Dialogs.close();
+		});
+
+	App.quit();
+
+}
+
+WinGUI.setTitle('Text Editor');
+
+var c = function() {};
+var n;
+var file;
 var changes = false;
 
 App.loadFrame('UI');
 
-$('#editor').on('keydown', function(e) {
+/* Set Editor */
 
-	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'O')
-		return openFile();
+var editor = $('#editor');
 
-	if(e.ctrlKey && e.shiftKey && String.fromCharCode(e.keyCode) === 'S')
-		return saveAsFile();
-
-	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'S')
-		return saveFile();
-
-	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'Q')
-		return App.events.on('quit')();
-
-	if(e.ctrlKey && String.fromCharCode(e.keyCode) === 'N')
-		Dialogs.dialog('Save changes ?', 'The file ' + file + ' has been edited.<br />Do you want to save it ?<br />Note : All not saved modifications will be definitively lost.', {
-
-			'Save': function() {
-				saveFile();
-				$('#editor').val('');
-				name = null;
-				file = null;
-				changes = false;
-				WinGUI.setTitle('Text Editor');
-				Dialogs.close();
-			},
-
-			'Do not save': function() {
-				$('#editor').val('');
-				name = null;
-				file = null;
-				changes = false;
-				WinGUI.setTitle('Text Editor');
-				Dialogs.close();
-			},
-
-			'Cancel': function() {
-				Dialogs.close();
-			}
-
-		});
-
-});
-
-$('#editor').on('input', function() {
-
+editor.on('input', function() {
 	changes = true;
-
 });
 
-App.events.on('quit', function() {
+/* Create GUI */
 
-	if(changes)
-		Dialogs.dialog('Save changes ?', 'The file ' + file + ' has been edited.<br />Do you want to save it ?<br />Note : All not saved modifications will be definitively lost.', {
+delete menuBar;
+var menuBar = new MenuBar();
+menuBar.setVisible(true);
 
-			'Save': function() {
-				saveFile();
-				App.quit();
-			},
+var fileMenu = new MenuElement('File');
+var _new     = new MenuItem('New', newFile);
+var _open    = new MenuItem('Open', openFile);
+var _save    = new MenuItem('Save', saveFile);
+var _saveAs  = new MenuItem('Save as...', saveAsFile);
+var _quit    = new MenuItem('Quit', quitFile);
 
-			'Do not save': function() {
-				App.quit();
-			},
+fileMenu.addItem(_new);
+fileMenu.addItem(_open);
+fileMenu.addItem(_save);
+fileMenu.addItem(_saveAs);
+fileMenu.addItem(_quit);
 
-			'Cancel': function() {
-				Dialogs.close();
-			}
+menuBar.addElement(fileMenu);
 
-		});
-	else
-		App.quit();
+GUI.setMenuBar(menuBar);
 
-});
+/* Set application events */
 
-if(open && !openFileCallback(open))
-	Dialogs.error('Cannot open ' + open);
+App.events.on('quit', quitFile);
