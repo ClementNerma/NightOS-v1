@@ -161,3 +161,8 @@ GUI.setMenuBar(menuBar);
 /* Set application events */
 
 App.events.on('quit', quitFile);
+
+/* Open a file if a file is specified */
+
+if(App.call.arguments.openFile)
+	openFile(App.call.arguments.openFile, true);

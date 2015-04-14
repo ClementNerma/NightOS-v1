@@ -115,6 +115,7 @@
                 "/system/boot/*",
                 "/system/apps/*",
                 "/apps/*",
+                "/libs/*",
                 "/users/common-data/*"
             ]
 

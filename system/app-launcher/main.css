@@ -1,7 +1,15 @@
 
 /* Set system fonts */
 
-@font-face {
+/*@font-face {
 	font-family: 'Ubuntu';
 	src: url('[ROOT_PATH]/system/styles/fonts/Ubuntu.woff');
+}*/
+
+body {
+	overflow: hidden;
+}
+
+#frame {
+	background-color: white;
 }

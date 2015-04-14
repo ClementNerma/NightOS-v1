@@ -69,9 +69,9 @@ var TaskManager = new function() {
 
 			}
 
-		}
+			$('#sys-task-manager .content').append($app);
 
-		$('#sys-task-manager .content').append($app);
+		}
 
 	}
 
@@ -86,9 +86,3 @@ var TaskManager = new function() {
 	}
 
 }
-
-setInterval(function() {
-
-	TaskManager.refresh();
-
-}, 1000);

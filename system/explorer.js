@@ -90,8 +90,10 @@ var Explorer = new function() {
 					picture.attr('src', 'data:image/png;base64,' + Registry.read('filesys/' +  ext + '/icon'));
 				else
 					picture.attr('src', 'data:image/png;base64,' + Registry.read('filesys/unknown/icon'));
-			else
-				picture.attr('src', 'data:image/png;base64,' + Core.applications.packageOf(shtPath.substr(4)).icon);
+			else {
+				var pkg = Core.applications.packageOf(shtPath.substr(4));
+				picture.attr('src', 'data:image/png;base64,' + (pkg ? pkg.icon : Registry.read('filesys/unknown/icon')));
+			}
 
 			name = $(document.createElement('span')).text(name);
 
@@ -214,10 +216,10 @@ var Explorer = new function() {
  	 		}, runAsAdmin);
 
  	 	if(path.substr(0, 4) === 'sys:')
- 	 		if(typeof(Explorer.FileSystem[path.substr(4)]) === 'function') {
- 	 			//console.log('open : ' + path.substr(4), file);
+ 	 		if(path === 'sys:TaskManager')
+ 	 			return TaskManager.open();
+ 	 		else if(typeof(Explorer.FileSystem[path.substr(4)]) === 'function')
 				return Explorer.FileSystem[path.substr(4)](file, file);
-			}
 			else
 				return Dialogs.error('File opener - Open failed', 'Cannot find system function : ' + path.substr(4))
 

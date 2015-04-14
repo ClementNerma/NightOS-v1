@@ -313,8 +313,6 @@ var Core = new function() {
 		 * @returns {Number}
 		 */
 
-		if(typeof(appLauncher) === 'undefined')
-
 		this.launch = function(name, args, runAsAdmin, adminPass) {
 
 			if(typeof(adminPass) !== 'undefined' && adminPass !== true && !Core.isAdminPassword(adminPass))
@@ -413,7 +411,7 @@ var Core = new function() {
 
 			Object.freeze(win);
 
-			var frame = $(document.createElement('iframe')).attr('sandbox', 'allow-scripts').attr('nwfaketop', true).attr('src', Core.path.format('/system/app-launcher/launcher.html')).attr('app', name).attr('app-id', id);
+			var frame = $(document.createElement('iframe')).attr('sandbox', 'allow-scripts').attr('nwfaketop', true).attr('nwdisable', true).attr('src', Core.path.format('/system/app-launcher/launcher.html')).attr('app', name).attr('app-id', id);
 
 			$('#app-' + name + '-' + id + ' .content:first').append(frame);
 
@@ -442,17 +440,17 @@ var Core = new function() {
 					},
 
 					appError: function(message, file, line, col, error, win) {
-						Dialogs.error('Application chrashed !', 'The ' + win.App.name + ' application crashed !<br /><br />Details :<br /><br /><span style="color: red;">' + message + '</span><br /><br />app-launcher:' + line + ',' + col);
+						Dialogs.error('Application crashed !', 'The ' + win.App.name + ' application crashed !<br /><br />Details :<br /><br /><span style="color: red;">' + message + '</span><br /><br />app-launcher:' + line + ',' + col);
 						Core.applications.close(win.App.name, win.App.ID)
 						// write error in log
 					}
 
 				}
 
-				this.contentWindow.launch(name, args, Core.vars.vars(), Core.applications.frames[name], Core.applications.frames[name][id].win, Core.applications.frames[name][id].cert, id, Core.path.root);
+				this.contentWindow.launch(name, args, Core.vars.vars(), Core.applications.frames[name], Core.applications.frames[name][id].win, Core.applications.frames[name][id].cert, id, Core.path.root, require, process);
 				this.contentWindow.readyToLaunch = true;
 			});
-
+			
 			this.frames[name].push({
 				id: id,
 				name: name,
@@ -469,7 +467,7 @@ var Core = new function() {
 
 		}
 
-		else
+		if(typeof(appLauncher) !== 'undefined')
 
 		this.launch = function(name, args) {
 
@@ -480,26 +478,24 @@ var Core = new function() {
 		/**
 		  * Close an application
 		  * @param {string} name Application name
-		  * @param {string} frame_ID Application frame ID
-		  * @return {Boolean} Return true if success
+		  * @param {string} frame_ID Application frame I		  * @return {Boolean} Return true if success
 		  */
-
-		if(typeof(appLauncher) === 'undefined')
 
 		this.close = function(name, frame_ID) {
 
 			this.frames[name][frame_ID].win.close();
+
 			this.frames[name].splice(frame_ID, 1);
 
-			/*$('#app-' + name + '-' + frame_ID).animate({
-				opacity: 0,
-				height: 0,
-				width: 0
-			}, 2000, function() {
-				$(this).remove();
-			});*/
+			if(!this.frames[name].length)
+				delete this.frames[name];
+
+			TaskManager.refresh(); // refresh the taskmanager
 
 		}
+
+		if(typeof(appLauncher) !== 'undefined')
+			delete this.close; // delete close function only now to permit JSDoc to generate documentation
 
 		/**
 		  * Get the package of an application
@@ -516,7 +512,7 @@ var Core = new function() {
 			else if(App.directoryExists('/apps/' + name))
 				var directory = '/apps/' + name;
 			else
-				return Dialogs.error('Application package', 'Cannot find application : ' + name);
+				return Debug.error('packageOf : Cannot find application : ' + name);
 			
 			return JSON.parse(App.readFile(directory + '/package.prm'));
 
@@ -627,8 +623,6 @@ var Core = new function() {
 		  * @return {Boolean} Return true if the installation success
 		  */
 
-		if(typeof(appLauncher) === 'undefined')
-
 		this.installFromPackage = function(package, con) {
 
 			var out = (con || Debug);
@@ -707,15 +701,90 @@ var Core = new function() {
 
 			out.write('The application has been sucessfully installed !');
 
+			delete package;
+
 			return true;
 
 		}
 
-		else
+		if(typeof(appLauncher) !== 'undefined')
 
 		this.installFromPackage = function(package, con) {
 
 			return installPackageApp(package, con);
+
+		}
+
+	}
+
+	/**
+	  * Use libraries in your applications
+	  * @constructor
+	  */
+
+	this.libraries = new function() {
+
+		/**
+		  * Check if a library is installed on this computer and is available
+		  * @param {string} name The library name
+		  * @return {Boolean}
+		  */
+
+		this.exists = function(name) {
+
+			return App.directoryExists('/libs/' + name);
+
+		}
+
+		/**
+		  * Get main library file name
+		  * @param {string} name The library name
+		  * @param {Boolean} uncompressed Get the uncompressed library main file name
+		  * @return {Boolean|String} Return false on fail
+		  */
+
+		this.getMainFileName = function(name, uncompressed) {
+
+			try {
+				return JSON.parse(App.readFile('/libs/' + name + '/package.json'))[(uncompressed ? 'lib' : 'min')];
+			}
+
+			catch(e) {
+				return false;
+			}
+
+		}
+
+		/**
+		  * Launch a library
+		  * @param {string} name The library name
+		  * @param {Boolean} uncompressed Use the uncompressed library
+		  * @return {Boolean} Return true if success
+		  */
+
+		this.require = function(name, uncompressed) {
+
+			if(!this.exists(name))
+				return Debug.error('The specified library doesn\'t exists');
+
+			var main = this.getMainFileName(name, uncompressed);
+
+			if(!main)
+				return Debug.error('Invalid library package : can\'t read main file name');
+
+			var file = App.readFile('/libs/' + name + '/' + main);
+
+			if(!file)
+				return Debug.error('Can\'t get library main file' + (App.lastStack(-1) ? ' : Needs privileges elevation' : ''));
+
+			try {
+				window.eval(file);
+				return true;
+			}
+
+			catch(e) {
+				return Debug.error('Can\'t run library main file : ' + new String(e));
+			}
 
 		}
 
@@ -1272,7 +1341,7 @@ var Core = new function() {
 
 		try {
 			var styles = fs.readdirSync(Core.path.root + '/system/styles');
-			styles.push('../../external-tools/font-awesome.css');
+			//styles.push('../../external-tools/font-awesome.css');
 
 			if(applicationLauncher)
 				styles.push('../app-launcher/main.css');
@@ -1430,6 +1499,7 @@ Object.freeze(Core);
 Object.freeze(Core.crypto);
 Object.freeze(Core.users);
 Object.freeze(Core.applications);
+Object.freeze(Core.libraries);
 Object.freeze(Core.certificates);
 Object.freeze(Core.backtrace);
 Object.freeze(Core.path);
@@ -1444,6 +1514,9 @@ window.path         = Core.path
 window.frames       = Core.frames
 window.vars         = Core.vars;
 window.crypto       = Core.crypto;
+window.libraries    = Core.libraries;
+
+var request = require(Core.path.root + '/external-tools/request');
 
 var APP_NAME        = (typeof(app_name) === 'undefined') ? 'System' : app_name;
 Core.vars.set('APP_NAME', APP_NAME);

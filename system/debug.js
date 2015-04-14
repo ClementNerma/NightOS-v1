@@ -21,6 +21,10 @@ var Debug = new function() {
 			args: args
 		});
 
+		console.log(msg);
+
+		return true;
+
 	}
 
 	this.warn = function(msg) {
@@ -37,6 +41,8 @@ var Debug = new function() {
 			msg: msg,
 			args: args
 		});
+
+		console.warn(msg);
 
 	}
 
@@ -75,6 +81,10 @@ var Debug = new function() {
 			msg: msg,
 			args: args
 		});
+
+		console.info(msg);
+
+		return true;
 
 	}
 

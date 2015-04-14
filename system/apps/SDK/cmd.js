@@ -57,6 +57,11 @@ var app = App.readFile(args[0] + '/app.js');
 var cmd = App.readFile(args[0] + '/cmd.js');
 var uninstaller = App.readFile(args[0] + '/uninstaller.js');
 
+files.splice(files.indexOf('package.prm'));
+
+if(files.indexOf('package.app') !== -1)
+	files.splice(files.indexOf('package.app'));
+
 if(!app)
 	return con.error('Cannot read main application file [app.js]');
 

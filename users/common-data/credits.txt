@@ -1,0 +1,29 @@
+
+Credits : Libraries used by NightOS and libraries which will be used by the system
+=======
+
+Actually used
+=============
+
+- jQuery (thanks to all contributors)
+- AngularJS (thanks to all contributors)
+- NodeJS request module (thanks to all contributors)
+- NodeJS watchdirectory module (thanks to krisnye)
+
+Will be used in next versions
+============
+
+- GSAP JS (thanks to GreenSock)
+- Twitter Bootstrap (thanks to all contributors)
+
+Security research
+=================
+
+- Thanks (a lot !) to motezazer
+
+Software development
+====================
+
+- Clement Nerma (https://github.com/ClementNerma)
+
+And thanks a lot to Fire4764 and EPonix from OpenClassRooms !

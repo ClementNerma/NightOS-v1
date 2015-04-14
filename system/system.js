@@ -49,7 +49,7 @@ var System = {
 		if(Core.path.included(path, '/users/$USER$/*'))
 			return 2;
 
-		if(!Core.path.included(path, '/system/*') && !Core.path.included(path, '/node-webkit/*') && !Core.path.included(path, '/external-tools/*') && !Core.path.included(path, '/apps/*'))
+		if(!Core.path.included(path, '/system/*') && !Core.path.included(path, '/node-webkit/*') && !Core.path.included(path, '/external-tools/*') && !Core.path.included(path, '/apps/*') && !Core.path.included(path, '/libs/*'))
 			return 3;
 
 		return 4;
