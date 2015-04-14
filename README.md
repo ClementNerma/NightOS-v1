@@ -4,9 +4,9 @@ NightOS is an open-source operating system based on NodeJS technology.
 
 ## How to install
 
-### Alpha Preview 0.1
+### Alpha Preview 0.2
 
-To install the Alpha Preview 0.1 version, just download this repository or click here : https://github.com/ClementNerma/NightOS/archive/master.zip
+To install the Alpha Preview 0.2 version, just download this repository or click here : https://github.com/ClementNerma/NightOS/archive/master.zip
 
 Then, extract the zip, go to the "node-webkit" directory, then to the directory corresponding to your architecture ('x86' or 'x64') and launch "nw" program.
 Each time a password is required, type "admin" and click and "OK" to confirm.
