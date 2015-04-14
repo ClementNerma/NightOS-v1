@@ -28,6 +28,6 @@ This project is under the license Creative Commons Attribution 4.0 International
 I'm not responsible for any damage caused to your computer by NightOS, including data lost, bugs, etc.
 I've minutetly studied the projet and if your computer encounter a problem with NightOS, it's certainly because of your computer and not of NightOS.
 
-# Documentation
+# Roadmap and documentation
 
-NightOS documentation is available [here](http://nightos.890m.com/doc/)
+NightOS documentation and roadmap are available [here](https://github.com/ClementNerma/NightOS/wiki)
