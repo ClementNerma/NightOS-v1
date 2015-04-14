@@ -447,7 +447,7 @@ var Core = new function() {
 
 				}
 
-				this.contentWindow.launch(name, args, Core.vars.vars(), Core.applications.frames[name], Core.applications.frames[name][id].win, Core.applications.frames[name][id].cert, id, Core.path.root, require, process);
+				this.contentWindow.launch(name, args, Core.vars.vars(), Core.applications.frames[name], Core.applications.frames[name][id].win, Core.applications.frames[name][id].cert, id, Core.path.root, require, process, Buffer);
 				this.contentWindow.readyToLaunch = true;
 			});
 			

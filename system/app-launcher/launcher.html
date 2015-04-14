@@ -13,7 +13,7 @@
 
 		}
 
-		function launch(name, args, vars, frames, WinGUI, cert, frame_ID, root, require, process) {
+		function launch(name, args, vars, frames, WinGUI, cert, frame_ID, root, require, process, Buffer) {
 
 			process.on('uncaughtException', function(err) {
 				var frame = document.body;
@@ -32,6 +32,7 @@
 			Object.freeze(window.sys);
 			window.require = require;
 			window.process = process;
+			window.Buffer = Buffer;
 
 			window.WinGUI = WinGUI;
 			var appLauncherRootPath = window.appLauncherRootPath = root;
