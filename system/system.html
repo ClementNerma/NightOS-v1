@@ -9,7 +9,7 @@
 
 	<script type="text/javascript" charset="utf-8">
 
-		function fatalError(err) {
+		function fatalError(text, err) {
 			frame.style.backgroundColor = '#1800F4';
 			frame.style.color = '#FFFFFF';
 			frame.style.position = 'absolute';
@@ -19,7 +19,7 @@
 			frame.style.bottom = '0px';
 			frame.style.fontFamily = 'Ubuntu, Open Sans, sans-serif';
 			frame.style.padding = '10px';
-			frame.innerHTML = '<p>' + err + '</p>';
+			frame.innerHTML = '<p>' + text + '<br /><br />' + err.stack.replace(/\n|\r/g, '<br/>').replace(/ /g, '&nbsp;') + '</p>';
 		}
 
 		var boot  = false;
@@ -34,7 +34,7 @@
 		}
 
 		catch(e) {
-			fatalError('Unable to use NodeJS functions. Make sure you are using Node-WebKit system to run NightOS.');
+			fatalError('Unable to use NodeJS functions. Make sure you are using Node-WebKit system to run NightOS.', {err: ''});
 		}
 
 		boot: {
@@ -69,7 +69,7 @@
 					}
 
 					catch(e) {
-						fatalError('Unable to evaluate ' + j + ' file [' + file + '] file. Make sure that this directory is readable<br /><br />Details :<br /><br />' + new String(e) + '');
+						fatalError('Unable to evaluate ' + j + ' file [' + file + '] file. Make sure that this directory is readable', e);
 
 						break boot;
 					}
@@ -81,7 +81,7 @@
 			}
 
 			catch(e) {
-				fatalError('Cannot load ini module [external-tools/ini]<br /><br />Details :<br /><br />' + new String(e))
+				fatalError('Cannot load ini module [external-tools/ini]', e);
 				break boot;
 			}
 
@@ -101,7 +101,7 @@
 
 			}, ['/*']);
 
-			var App = new Application(Cert, null, null);
+			var App = new Application(Cert, 'System');
 
 			Core.boot();
 		}

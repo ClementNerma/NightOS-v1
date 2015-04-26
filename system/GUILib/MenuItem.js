@@ -10,7 +10,7 @@ var MenuItem = function(text, callback) {
 	/**
 	  * Change the label of the item
 	  * @param {string} text The label of the item
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.setText = function(text) {
@@ -27,7 +27,7 @@ var MenuItem = function(text, callback) {
 
 	/**
 	  * Get the current label of the buttin
-	  * @return {string}
+	  * @returns {string}
 	  */
 
 	this.text = function() {
@@ -39,7 +39,7 @@ var MenuItem = function(text, callback) {
 	/**
 	  * Set the callback for the click event
 	  * @param {Function} callback The click event callback
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.setClick = function(callback) {
@@ -54,7 +54,7 @@ var MenuItem = function(text, callback) {
 
 	/**
 	  * Get the current click event callback
-	  * @return {Function}
+	  * @returns {Function}
 	  */
 
 	this.click = function() {
@@ -98,7 +98,7 @@ var MenuItem = function(text, callback) {
 
 	/**
 	  * Know if the item is enabled or not
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.enabled = function() {

@@ -33,7 +33,7 @@ var Explorer = new function() {
 		/**
 		  * Return an HTML shortcut to a directory
 		  * @param {string} path directory path
-		  * @return {Object} HTML Node Element
+		  * @returns {Object} HTML Node Element
 		  */
 
 		this.directory = function(path) {
@@ -56,7 +56,7 @@ var Explorer = new function() {
 		/**
 		  * Return an HTML shortcut to a file
 		  * @param {string} path File path
-		  * @return {Object|Boolean} HTML Node Element
+		  * @returns {Object|Boolean} HTML Node Element
 		  */
 
 		this.file = function(path) {
@@ -188,7 +188,7 @@ var Explorer = new function() {
 	/**
 	  * Read the file extension
 	  * @param {string} file Filename
-	  * @return {string} File extension. Return 'unknown' if the file hasn't extension
+	  * @returns {string} File extension. Return 'unknown' if the file hasn't extension
 	  */
 
  	this.fileExtension = function(file) {
@@ -203,7 +203,7 @@ var Explorer = new function() {
  	  * @param {string} path File or application path
  	  * @param {string} file Original file path
  	  * @param {Boolean} runAsAdmin Specify if you want to launch the file as administrator.
- 	  * @return {Boolean} Return true on opening success
+ 	  * @returns {Boolean} Return true on opening success
  	  */
 
  	 this.open = function(path, file, runAsAdmin) {

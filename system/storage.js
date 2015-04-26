@@ -10,7 +10,7 @@ var Storage = new function() {
 	var appDirectory = directory;
 	var watchdir     = require(Core.path.root + '/external-tools/watchdir.js');
 
-	function authorize(funcName, ignorePath, acceptReadableFolders) {
+	function authorize(funcName, ignorePath, acceptReadableDirectories) {
 
 		var args = Core.backtrace.getCaller().arguments;
 
@@ -20,7 +20,7 @@ var Storage = new function() {
 
 		var path = Core.path.format(args[1]);
 
-		if((!args[0].hasAccess(path, acceptReadableFolders) && !ignorePath) || !args[0].hasPermission(['storage', funcName.replace(/([a-z])([A-Z])/g, function(a, b, c) { return b + '_' + c.toLowerCase(); })]))
+		if((!args[0].hasAccess(path, acceptReadableDirectories) && !ignorePath) || !args[0].hasPermission(['storage', funcName.replace(/([a-z])([A-Z])/g, function(a, b, c) { return b + '_' + c.toLowerCase(); })]))
 			return Debug.error(System.errors.NOPERM);
 			//console.log(path);
 
@@ -35,7 +35,7 @@ var Storage = new function() {
 	/**
 	 * Know if a path exists AND is a directory
 	 * @param {string} path The path to test
-	 * @return {Boolean} true if the specified path is a directory
+	 * @returns {Boolean} true if the specified path is a directory
 	 */
 
 	this.directoryExists = function(path) {
@@ -53,7 +53,7 @@ var Storage = new function() {
 	/**
 	 * Know if a path exists AND is a file
 	 * @param {string} path The path to test
-	 * @return {Boolean} true if the specified path is a file
+	 * @returns {Boolean} true if the specified path is a file
 	 */
 
 	this.fileExists = function(path) {
@@ -71,7 +71,7 @@ var Storage = new function() {
 	/**
 	  * Know if a path exists
 	  * @param {string} path The path to test
-	  * @return {Boolean} true if the specified path exists
+	  * @returns {Boolean} true if the specified path exists
 	  */
 
 	this.exists = function(path) {
@@ -84,7 +84,7 @@ var Storage = new function() {
 	 * Write a value in a file
 	 * @param {string} file
 	 * @param {string} value
-	 * @return {Boolean} Success of writing
+	 * @returns {Boolean} Success of writing
 	 */
 
 	this.writeFile = function(_cert, file, value, charset) {
@@ -119,7 +119,7 @@ var Storage = new function() {
 	  * Read a file
 	  * @param {string} file
 	  * @param {string} charset
-	  * @return {string}
+	  * @returns {string}
 	  */
 
 	this.readFile = function(_cert, file, charset) {
@@ -185,7 +185,7 @@ var Storage = new function() {
 	  * @param {string} srcFile File path
 	  * @param {string} destFile File destination
 	  * @param {Number} BUFF_LENGTH Buffer length. If not specified, BUFF_LENGTH equals System.FileSystem.defaultBufferLength
-	  * @return {Boolean} Return true if sucess
+	  * @returns {Boolean} Return true if sucess
 	  */
 
 	this.copyFile = function(_cert, srcFile, destFile, BUFF_LENGTH) {
@@ -252,7 +252,7 @@ var Storage = new function() {
 	  * @param {string} srcFile File path
 	  * @param {string} destFile File destination
 	  * @param {Number} BUFF_LENGTH Buffer length. If not specified, BUFF_LENGTH equals System.FileSystem.defaultBufferLength
-	  * @return {Boolean} Return true if sucess
+	  * @returns {Boolean} Return true if sucess
 	  */
 
 	this.moveFile = function(_cert, srcFile, destFile, BUFF_LENGTH) {
@@ -317,7 +317,7 @@ var Storage = new function() {
 	/**
 	  * Get informations from a file, such as size...
 	  * @param {string} path The file path
-	  * @return {Boolean|Object} Return false if an error occured, else return an object which contains many informations on the file
+	  * @returns {Boolean|Object} Return false if an error occured, else return an object which contains many informations on the file
 	  */
 
 	this.getFileInformations = function(_cert, path) {
@@ -354,7 +354,7 @@ var Storage = new function() {
 	/**
 	  * Get the size of a file
 	  * @param {string} path The file path
-	  * @return {Boolean|Object} Return false if an error occured, else return the file size
+	  * @returns {Boolean|Object} Return false if an error occured, else return the file size
 	  */
 
 	this.getFileSize = function(_cert, directory) {
@@ -386,7 +386,7 @@ var Storage = new function() {
 	/**
 	  * Create a new directory
 	  * @param {string} directory
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.makeDir = function(_cert, directory) {
@@ -418,7 +418,7 @@ var Storage = new function() {
 	/**
 	  * Delete an empty directory
 	  * @param {string} directory
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.removeDir = function(_cert, directory) {
@@ -450,7 +450,7 @@ var Storage = new function() {
 	/**
 	  * Read a directory
 	  * @param {string} directory
-	  * @return {Array}
+	  * @returns {Array}
 	  */
 
 	this.readDir = function(_cert, directory) {
@@ -481,7 +481,7 @@ var Storage = new function() {
 	/**
 	  * Return files list from directory
 	  * @param {string} directory
-	  * @return {Array}
+	  * @returns {Array}
 	  */
 
 	this.readDirFiles = function(_cert, directory) {
@@ -514,7 +514,7 @@ var Storage = new function() {
 	/**
 	  * Return directorys list from directory
 	  * @param {string} directory
-	  * @return {Array}
+	  * @returns {Array}
 	  */
 
 	this.readSubDirs = function(_cert, directory) {
@@ -548,7 +548,7 @@ var Storage = new function() {
 	  * Rename a file or a directory
 	  * @param {string} old_name Old name
 	  * @param {string} new_name New name
-	  * @return {Boolean} Return true if success
+	  * @returns {Boolean} Return true if success
 	  */
 
 	this.rename = function(_cert, old_name, new_name) {
@@ -611,7 +611,7 @@ var Storage = new function() {
 	  * Load an application frame
 	  * @param {string} name Frame name (without extension)
 	  * @param {Object} context DOM Element
-      * @return {Boolean} Return true if success
+      * @returns {Boolean} Return true if success
 	  */
 
 	this.loadFrame = function(_cert, name, context) {
@@ -625,7 +625,7 @@ var Storage = new function() {
 
 		if(!_cert.hasPermission(['storage', 'load_frame']))
 			return Debug.error(System.errors.NOPERM);
-			//throw new Error(System.errors.NOPERM);
+		//throw new Error(System.errors.NOPERM);
 
 		if(typeof(context) !== 'object')
 			context = $('body');

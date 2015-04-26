@@ -19,7 +19,7 @@ var MenuElement = function(text) {
 	/**
 	  * Change the label of the element
 	  * @param {string} text The label of the element
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.setText = function(text) {
@@ -36,7 +36,7 @@ var MenuElement = function(text) {
 
 	/**
 	  * Get the current label of the buttin
-	  * @return {string}
+	  * @returns {string}
 	  */
 
 	this.text = function() {
@@ -59,7 +59,7 @@ var MenuElement = function(text) {
 
 	/**
 	  * Know if the element is visible
-	  * @return {Number} Return 0 or 1
+	  * @returns {Number} Return 0 or 1
 	  */
 
 	this.visible = function() {
@@ -71,7 +71,7 @@ var MenuElement = function(text) {
 	/**
 	  * Add a MenuItem object to the menu element
 	  * @param {MenuItem} item
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.addItem = function(item) {

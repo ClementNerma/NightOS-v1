@@ -6,20 +6,15 @@ App.loadFrame('style');
 $('body').append($(document.createElement('div')).attr('id', 'terminal'));
 
 var terminal = new Console($('#terminal'), false);
+//terminal.write("\n    ==== NightOS terminal ====\n");
+var file;
 
-terminal.write("\n    ==== NightOS terminal ====\n");
+if(file = App.readFile('/system/cmd/terminal.nsc'));
+    terminal.run(file)
+
+if(file = App.readFile('/users/$USER$/.config/terminal.nsc'));
+    terminal.run(file);
+
 terminal.invite();
 
 $('#terminal').focus();
-
-/*
-App.events.on('quit', function() {
-
-	Dialogs.confirm('Application closer', 'Do you really want to close the terminal ?', function() {
-
-		App.quit();
-
-	}, function() {});
-
-});
-*/

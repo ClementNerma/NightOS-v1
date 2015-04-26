@@ -13,7 +13,7 @@ var GUI = function() {
 	/**
 	  * Set a menu bar to your application window
 	  * @param {MenuBar} menuBar
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.setMenuBar = function(menuBar) {
@@ -38,7 +38,7 @@ var GUI = function() {
 
 	/**
 	  * Get the current application menu bar
-	  * @return {MenuBar}
+	  * @returns {MenuBar}
 	  */
 
 	this.menuBar = function() {
@@ -50,7 +50,7 @@ var GUI = function() {
 	/**
 	  * Set a layout to your application window
 	  * @param {Layout} layout
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.setLayout = function(layout) {
@@ -74,7 +74,7 @@ var GUI = function() {
 
 	/**
 	  * Get the current application layout
-	  * @return {Layout}
+	  * @returns {Layout}
 	  */
 
 	this.layout = function() {
@@ -86,7 +86,7 @@ var GUI = function() {
 	/**
 	  * Set a status bar to your application window
 	  * @param {StatusBar} statusBar
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.setStatusBar = function(statusBar) {
@@ -111,7 +111,7 @@ var GUI = function() {
 
 	/**
 	  * Get the current application status bar
-	  * @return {StatusBar}
+	  * @returns {StatusBar}
 	  */
 
 	this.statusBar = function() {

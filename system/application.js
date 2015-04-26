@@ -33,14 +33,14 @@ Application.prototype.getStacks = function() { return this.stacks; }
 
 /**
   * Get the certificate of the application
-  * @return {Object} The application certificate
+  * @returns {Object} The application certificate
   */
 
 Application.prototype.getCertificate = function() { return this.certificate; }
 
 /**
   * Get the application launched source code (app.js file)
-  * @return {string} The application launcher (app.js)
+  * @returns {string} The application launcher (app.js)
   */
 
 Application.prototype.getLauncher = function() { return this.app; }
@@ -83,7 +83,7 @@ Application.prototype.watchDir = function(path, options, callback) { return Stor
  * @param {string} file
  * @param {string} value
  * @param {string} charset [Optionnal] Change the default write charset. Default : utf8
- * @return {Boolean} Success of writing
+ * @returns {Boolean} Success of writing
  */
 
 Application.prototype.writeFile = function(file, value, charset) { return Storage.writeFile(this.certificate, file, value, charset); }
@@ -92,7 +92,7 @@ Application.prototype.writeFile = function(file, value, charset) { return Storag
   * Read a file
   * @param {string} file
   * @param {string} charset
-  * @return {string} The file content
+  * @returns {string} The file content
   */
 
 Application.prototype.readFile = function(file, charset) { return Storage.readFile(this.certificate, file, charset); }
@@ -101,7 +101,7 @@ Application.prototype.readFile = function(file, charset) { return Storage.readFi
   * Rename a file or a directory
   * @param {string} old_name Old name
   * @param {string} new_name New name
-  * @return {Boolean} Return true if success
+  * @returns {Boolean} Return true if success
   */
 
 Application.prototype.rename = function(old_name, new_name) { return Storage.rename(this.certificate, old_name, new_name); }
@@ -119,7 +119,7 @@ Application.prototype.removeFile = function(file) { return Storage.removeFile(th
   * @param {string} srcFile File path
   * @param {string} destFile File destination
   * @param {Number} BUFF_LENGTH Buffer length. If not specified, BUFF_LENGTH equals System.FileSystem.defaultBufferLength
-  * @return {Boolean} Return true if sucess
+  * @returns {Boolean} Return true if sucess
   */
 
 Application.prototype.copyFile = function(srcFile, destFile, BUFFER_LENGTH) { return Storage.copyFile(this.certificate, srcFile, destFile, BUFFER_LENGTH); }
@@ -129,7 +129,7 @@ Application.prototype.copyFile = function(srcFile, destFile, BUFFER_LENGTH) { re
   * @param {string} srcFile File path
   * @param {string} destFile File destination
   * @param {Number} BUFF_LENGTH Buffer length. If not specified, BUFF_LENGTH equals System.FileSystem.defaultBufferLength
-  * @return {Boolean} Return true if sucess
+  * @returns {Boolean} Return true if sucess
   */
 
 Application.prototype.moveFile = function(srcFile, destFile, BUFFER_LENGTH) { return Storage.moveFile(this.certificate, srcFile, destFile, BUFFER_LENGTH); }
@@ -137,7 +137,7 @@ Application.prototype.moveFile = function(srcFile, destFile, BUFFER_LENGTH) { re
 /**
   * Create a new directory
   * @param {string} directory
-  * @return {Boolean}
+  * @returns {Boolean}
   */
 
 Application.prototype.makeDir = function(path) { return Storage.makeDir(this.certificate, path); }
@@ -145,7 +145,7 @@ Application.prototype.makeDir = function(path) { return Storage.makeDir(this.cer
 /**
   * Read a directory
   * @param {string} directory
-  * @return {Array}
+  * @returns {Array}
   */
 
 Application.prototype.readDir = function(path) { return Storage.readDir(this.certificate, path); }
@@ -153,7 +153,7 @@ Application.prototype.readDir = function(path) { return Storage.readDir(this.cer
 /**
   * Return files list from a directory
   * @param {string} directory
-  * @return {Array}
+  * @returns {Array}
   */
 
 Application.prototype.readDirFiles = function(path) { return Storage.readDirFiles(this.certificate, path); }
@@ -161,7 +161,7 @@ Application.prototype.readDirFiles = function(path) { return Storage.readDirFile
 /**
   * Return directorys list from a directory
   * @param {string} directory
-  * @return {Array}
+  * @returns {Array}
   */
 
 Application.prototype.readSubDirs = function(path) { return Storage.readSubDirs(this.certificate, path); }
@@ -169,7 +169,7 @@ Application.prototype.readSubDirs = function(path) { return Storage.readSubDirs(
 /**
   * Remove an empty directory
   * @param {string} directory
-  * @return {Boolean}
+  * @returns {Boolean}
   */
 
 Application.prototype.removeDir = function(path) { return Storage.removeDir(this.certificate, path); }
@@ -177,7 +177,7 @@ Application.prototype.removeDir = function(path) { return Storage.removeDir(this
 /**
  * Check if a path exists AND is a file
  * @param {string} path The path to test
- * @return {Boolean} true if the specified path is a file
+ * @returns {Boolean} true if the specified path is a file
  */
 
 Application.prototype.fileExists = function(path) { return Storage.fileExists(path); }
@@ -185,7 +185,7 @@ Application.prototype.fileExists = function(path) { return Storage.fileExists(pa
 /**
  * Check if a path exists AND is a directory
  * @param {string} path The path to test
- * @return {Boolean} true if the specified path is a directory
+ * @returns {Boolean} true if the specified path is a directory
  */
 
 Application.prototype.directoryExists = function(path) { return Storage.directoryExists(path); }
@@ -193,7 +193,7 @@ Application.prototype.directoryExists = function(path) { return Storage.director
 /**
   * Check if a path exists
   * @param {string} path The path to test
-  * @return {Boolean} true if the specified path exists
+  * @returns {Boolean} true if the specified path exists
   */
 
 Application.prototype.exists = function(path) { return Storage.exists(path); }
@@ -201,7 +201,7 @@ Application.prototype.exists = function(path) { return Storage.exists(path); }
 /**
   * Get informations from a file, such as size...
   * @param {string} path The file path
-  * @return {Boolean|Object} Return false if an error occured, else return an object which contains many informations on the file
+  * @returns {Boolean|Object} Return false if an error occured, else return an object which contains many informations on the file
   */
 
 Application.prototype.getFileInformations = function(path) { return Storage.getFileInformations(this.certificate, path); }
@@ -209,7 +209,7 @@ Application.prototype.getFileInformations = function(path) { return Storage.getF
 /**
   * Get the size of a file
   * @param {string} path The file path
-  * @return {Boolean|Object} Return false if an error occured, else return the file size
+  * @returns {Boolean|Object} Return false if an error occured, else return the file size
   */
 
 Application.prototype.getFileSize = function(path) { return Storage.getFileSize(this.certificate, path); }
@@ -303,7 +303,7 @@ Application.prototype.events = new function() {
 	  * Set or get an event
 	  * @param {string} name The name of the event
 	  * @param {function} callback If omitted, this function return the specified event. Else, the event will be erased and replaced by the specified callback.
-	  * @return {Boolean|function} Return false if an error occured. Else, return the event callback.
+	  * @returns {Boolean|function} Return false if an error occured. Else, return the event callback.
 	  */
 
 	this.on = function(name, callback) {

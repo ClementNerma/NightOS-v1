@@ -1,0 +1,10 @@
+
+div[console-container="true"] {
+    color: white;
+    background-color: black;
+    overflow: auto;
+}
+
+div[console-container="true"] div[contenteditable="true"] {
+    min-width: 100px;
+}

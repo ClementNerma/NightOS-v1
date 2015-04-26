@@ -12,13 +12,13 @@ var define = new function() {
 
 	}
 
-}
+};
 
 var def = function(name, value) {
 
 	return define.exec(name, value);
 
-}
+};
 
 var fs = require('fs');
 
@@ -29,8 +29,83 @@ var fs = require('fs');
 
 var Core = new function() {
 
-	/**
-	  * crypto
+    /**
+     * Core variables
+     * @constructor
+     */
+
+    this.vars = new function() {
+
+        var _vars = {};
+        var _constants = {};
+        var _watchers = {};
+
+        /**
+         * Set a variable
+         * @param {string} name
+         * @param {*} value
+         * @returns {Boolean}
+         */
+
+        this.set = function(name, value, isConstant) {
+
+            if(_constants[name])
+                return false;
+
+            var old = _vars[name];
+
+            _vars[name] = value;
+            _constants[name] = isConstant;
+            window['_' + name + '_'] = value;
+
+            if(_watchers[name])
+                _watchers[name](old, value);
+
+            return true;
+
+        };
+
+        /**
+         * Watch a variable
+         * @param {string} name
+         * @param {function} [callback]
+         */
+
+        this.watch = function(name, callback) {
+
+            if(typeof(callback) === 'function')
+                _watchers[name] = callback;
+
+            return _watchers[name];
+
+        };
+
+        /**
+         * Return a specific variable
+         * @param {string} name
+         */
+
+        this.get = function(name) {
+
+            return _vars[name];
+
+        };
+
+        /**
+         * Return all defined vars
+         * @returns {Object} vars All defined vars
+         */
+
+        this.vars = function() {
+
+            return _vars;
+
+        };
+
+    };
+
+    /**
+	  * Cryptography library
 	  * @constructor
 	  */
 
@@ -41,12 +116,12 @@ var Core = new function() {
 
 		this.getSignPublicKey = function() {
 			return _fs.readFileSync(Core.path.root + '/system/sign/RSA-public-4096.pem', 'utf8');
-		}
+		};
 		
 		/**
 	      * Hash a string with SHA384 algorithm
 	      * @param {string} str The string to hash
-	      * @return {string} The hashed string
+	      * @returns {string} The hashed string
 	      */
 
 		this.hash = function(str) {
@@ -62,12 +137,12 @@ var Core = new function() {
 		}
 
 		/**
-		  * Protect a password, usin PBKDF2 algorithm
-		  * @param {string} str The string to hash
+		  * Protect a password, using PBKDF2 algorithm
+		  * @param {string} pass The string to hash
 		  * @param {string} salt The HMAC salt
 		  * @param {Number} iterations The number of hashs. Default : 50 000
 		  * @param {Number} keylen The generated key length. Default : 48
-		  * @return {string} The secured-hashed string
+		  * @returns {string} The secured-hashed string
 		  */
 
 		this.password = function(pass, salt, iterations, keylen) {
@@ -94,7 +169,7 @@ var Core = new function() {
 		  * @param {string} priv The private key (ex: The private RSA key)
 		  * @param {string} output The output format. Default : hex
 		  * @param {string} algo The signature algorithm to use. Default : RSA-SHA384
-		  * @return {string} The signed data
+		  * @returns {string} The signed data
 		  */
 
 		this.sign = function(data, priv, output, algo) {
@@ -117,17 +192,17 @@ var Core = new function() {
 		  * @param {string} bef The data before sign
 		  * @param {string} pub The public key (ex: The public RSA key)
 		  * @param {string} input The signature format. Default : hex
-		  * @param {sstring} algo The signature algorithm used. Default : RSA-SHA384
-		  * @return {Boolean} Return true if the signature is correct
+		  * @param {string} algo The signature algorithm used. Default : RSA-SHA384
+		  * @returns {Boolean} Return true if the signature is correct
 		  */
 
 		this.verify = function(sign, bef, pub, input, algo) {
 
 			if(typeof(input) !== 'string')
-				var input = 'hex';
+				input = 'hex';
 
 			if(typeof(algo) !== 'string')
-				var algo = 'RSA-SHA384';
+				algo = 'RSA-SHA384';
 
 			var v = _cr.createVerify(algo);
 			v.update(bef);
@@ -152,7 +227,7 @@ var Core = new function() {
 		/**
 		  * Get informations about a user (permissions, icon, hashed password, etc.)
 		  * @param {string} user Username
-		  * @return {Boolean|object} User informations
+		  * @returns {Boolean|object} User informations
 		  */
 
 		if(typeof(applicationLauncher) === 'undefined')
@@ -165,7 +240,7 @@ var Core = new function() {
 
 			catch(e) { return false; }
 
-		}
+		};
 
 		/**
 		  * Login as a user. Please note that you can't login more of one time
@@ -199,41 +274,41 @@ var Core = new function() {
 
 			return true;
 
-		}
+		};
 
 		/**
 		  * Know if the current user has administrator privileges
-		  * @return {Boolean} Return true if the current user has administrator privileges
+		  * @returns {Boolean} Return true if the current user has administrator privileges
 		  */
 
 		this.isAdmin = function() {
 
 			return _admin;
 
-		}
+		};
 
 		/**
 		  * Know if a specified password is the administrator password
 		  * @param {string} password The password
-		  * @return {Boolean} Return true if the specified password is the administrator password
+		  * @returns {Boolean} Return true if the specified password is the administrator password
 		  */
 
 		this.isAdminPassword = function(password) {
 
 			return (Core.crypto.password(password, 'admin', 50000, 48) === Core.users.get('admin').password);
 
-		}
+		};
 
 		/**
 		  * Return actual user informations. Return an empty object if you are not logged in.
-		  * @return {Object}
+		  * @returns {Object}
 		  */
 
 		this.user = function() {
 			return _user;
-		}
+		};
 
-	}
+	};
 
 	/**
 	  * Core.applications constructor
@@ -249,7 +324,7 @@ var Core = new function() {
 		/**
 		  * Get an application
 		  * @param {string} name Application name
-		  * @return {Object|Boolean} Return false if an error occurred
+		  * @returns {Object|Boolean} Return false if an error occurred
 		  */
 
 		this.get = function(name) {
@@ -276,11 +351,13 @@ var Core = new function() {
 					}
 				}
 
+            var directory;
+
 			if(App.directoryExists('/system/apps/' + name)) {
-				var directory = '/system/apps/' + name;
+				directory = '/system/apps/' + name;
 				app.isSystem = true;
 			} else if(App.directoryExists('/apps/' + name))
-				var directory = '/apps/' + name;
+				directory = '/apps/' + name;
 			else
 				return Debug.error('Application getter', 'Application directory wasn\'t found', name);
 
@@ -303,7 +380,7 @@ var Core = new function() {
 
 			return app;
 
-		}
+		};
 
 		/**
 		 * Launch an application
@@ -323,7 +400,6 @@ var Core = new function() {
 			name = name.replace(/[^a-zA-Z0-9 _\-]/g, '');
 
 			var r = Registry.read('commands/alias');
-			var n = null;
 
 			for(var i in r)
 				for(var j in r[i])
@@ -426,13 +502,13 @@ var Core = new function() {
 
 					return Core.applications.launch(name, args);
 
-				}
+				};
 
 				this.contentWindow.installPackageApp = function(package, con) {
 
 					return Core.applications.installFromPackage(package, con);
 
-				}
+				};
 
 				this.contentWindow.sys = {
 					quitApp: function(name, frame_ID) {
@@ -445,7 +521,7 @@ var Core = new function() {
 						// write error in log
 					}
 
-				}
+				};
 
 				this.contentWindow.launch(name, args, Core.vars.vars(), Core.applications.frames[name], Core.applications.frames[name][id].win, Core.applications.frames[name][id].cert, id, Core.path.root, require, process, Buffer);
 				this.contentWindow.readyToLaunch = true;
@@ -465,7 +541,7 @@ var Core = new function() {
 
 			return true;
 
-		}
+		};
 
 		if(typeof(appLauncher) !== 'undefined')
 
@@ -473,12 +549,12 @@ var Core = new function() {
 
 			return launchApp(name, args);
 
-		}
+		};
 
 		/**
 		  * Close an application
 		  * @param {string} name Application name
-		  * @param {string} frame_ID Application frame I		  * @return {Boolean} Return true if success
+		  * @param {string} frame_ID Application frame I		  * @returns {Boolean} Return true if success
 		  */
 
 		this.close = function(name, frame_ID) {
@@ -492,7 +568,7 @@ var Core = new function() {
 
 			TaskManager.refresh(); // refresh the taskmanager
 
-		}
+		};
 
 		if(typeof(appLauncher) !== 'undefined')
 			delete this.close; // delete close function only now to permit JSDoc to generate documentation
@@ -500,7 +576,7 @@ var Core = new function() {
 		/**
 		  * Get the package of an application
 		  * @param {string} name Application name
-		  * @return {Object|Boolean} Return the application package or false if can't get the icon
+		  * @returns {Object|Boolean} Return the application package or false if can't get the icon
 		  */
 
 		this.packageOf = function(name) {
@@ -516,36 +592,36 @@ var Core = new function() {
 			
 			return JSON.parse(App.readFile(directory + '/package.prm'));
 
-		}
+		};
 
 		/**
 		  * Know if an application is installed on the computer
 		  * @param {string} name Application name
-		  * @return {Boolean}
+		  * @returns {Boolean}
 		  */
 
 		this.exists = function(name) {
 
 			return (App.directoryExists('/system/apps/' + name) || App.directoryExists('/apps/' + name));
 
-		}
+		};
 
 		/**
 		  * Check if an application name is valid
 		  * @param {string} name Application name
-		  * @return {Boolean}
+		  * @returns {Boolean}
 		*/
 
 		this.isValidName = function(name) {
 
 			return (name.replace(/[^a-zA-Z0-9 _\-\.]/g, '') === name);
 
-		}
+		};
 
 		/**
 		  * Check if an application package is valid
 		  * @param {string|Object} package Application package (JSON string or JSON object)
-		  * @return {Boolean}
+		  * @returns {Boolean}
 		  */
 
 		this.isValidPackage = function(package) {
@@ -584,27 +660,27 @@ var Core = new function() {
 
 			return true;
 
-		}
+		};
 
 		/**
 		  * Check if an application package is correctly signed
-		  * @param {string|Object} package Application package (JSON string or JSON object)
-		  * @return {Boolean}
+		  * @param {string|Object} pkg Application package (JSON string or JSON object)
+		  * @returns {Boolean}
 		  */
 
-		this.isSignedPackage = function(package) {
+		this.isSignedPackage = function(pkg) {
 
-			if(!this.isValidPackage(package))
-				return Debug.error('Not a valid application package');
+			if(!this.isValidPackage(pkg))
+				return Debug.error('Not a valid application pkg');
 
-			if(typeof(package) !== 'object')
-				package = JSON.parse(package);
+			if(typeof(pkg) !== 'object')
+				pkg = JSON.parse(pkg);
 
-			if(typeof(package.sign) !== 'object')
-				return Debug.error('The application package isn\'t signed');
+			if(typeof(pkg.sign) !== 'object')
+				return Debug.error('The application pkg isn\'t signed');
 
-			var sign = package.sign;
-			delete package.sign;
+			var sign = pkg.sign;
+			delete pkg.sign;
 
 			check = ['signed', 'input', 'algorithm'];
 
@@ -612,15 +688,15 @@ var Core = new function() {
 				if(!sign[check[i]])
 					return Debug.error('The application package sign object doesn\'t contains the required fields [' + check[i].escapeHTML() + ']');
 
-			return Core.crypto.sign(sign.signed, JSON.stringify(package), Core.crypto.getSignPublicKey(), sign.input, sign.algorithm);
+			return Core.crypto.sign(sign.signed, JSON.stringify(pkg), Core.crypto.getSignPublicKey(), sign.input, sign.algorithm);
 
-		}
+		};
 
 		/**
 		  * Install an application from a package
 		  * @param {Object} package Application package
 		  * @param {Object} con [Optionnal] The output debug console
-		  * @return {Boolean} Return true if the installation success
+		  * @returns {Boolean} Return true if the installation success
 		  */
 
 		this.installFromPackage = function(package, con) {
@@ -670,7 +746,7 @@ var Core = new function() {
 
 			delete package.files;
 
-			out.write('| Writing package.prm...');
+			out.write('Writing package.prm...');
 
 			if(!App.writeFile(dir + 'package.prm', JSON.stringify(package))) {
 				App.removeDir(dir);
@@ -689,13 +765,14 @@ var Core = new function() {
 					str: d.toString(),
 					day: d.getDay(),
 					month: d.getMonth(),
-					year: d.getFullYear()
+					year: d.getFullYear(),
+                    exact: d.getTime()
 				},
 
 				package: o_p
 
 			}))
-				out.write(' - Successfull', true);
+				out.success(' - Successfull', true);
 			else
 				out.error(' - Failed', true);
 
@@ -715,7 +792,7 @@ var Core = new function() {
 
 		}
 
-	}
+	};
 
 	/**
 	  * Use libraries in your applications
@@ -727,20 +804,20 @@ var Core = new function() {
 		/**
 		  * Check if a library is installed on this computer and is available
 		  * @param {string} name The library name
-		  * @return {Boolean}
+		  * @returns {Boolean}
 		  */
 
 		this.exists = function(name) {
 
 			return App.directoryExists('/libs/' + name);
 
-		}
+		};
 
 		/**
 		  * Get main library file name
 		  * @param {string} name The library name
 		  * @param {Boolean} uncompressed Get the uncompressed library main file name
-		  * @return {Boolean|String} Return false on fail
+		  * @returns {Boolean|String} Return false on fail
 		  */
 
 		this.getMainFileName = function(name, uncompressed) {
@@ -753,13 +830,13 @@ var Core = new function() {
 				return false;
 			}
 
-		}
+		};
 
 		/**
 		  * Launch a library
 		  * @param {string} name The library name
 		  * @param {Boolean} uncompressed Use the uncompressed library
-		  * @return {Boolean} Return true if success
+		  * @returns {Boolean} Return true if success
 		  */
 
 		this.require = function(name, uncompressed) {
@@ -786,13 +863,11 @@ var Core = new function() {
 				return Debug.error('Can\'t run library main file : ' + new String(e));
 			}
 
-		}
+		};
 
-	}
+	};
 
 	this.certificates = new function() {
-
-		var fs = require('fs');
 
 		/**
 		  * Know if an application has access to a specified path with a specified permission
@@ -809,7 +884,7 @@ var Core = new function() {
 				throw new Error(System.errors.INVALID_CERTIFICATE);
 
 			return (cert.hasPermission(type) && cert.hasAccess(path));
-		}
+		};
 
 	}
 
@@ -821,46 +896,14 @@ var Core = new function() {
 
 		/**
 		  * Get backtrace
-		  * @returns {Array}
+		  * @returns {string}
 		  */
 
 		this.get = function() {
 
-			for(var frame = arguments.callee, stale = []; frame; frame = frame.caller) {
-				if(stale.indexOf(frame) >= 0)
-					break;
-
-				stale.push({
-					context: frame,
-					args: frame.arguments,
-				});
-			}
-
-			return stale;
+            return (new Error('')).stack.replace(/^(.*?)\n/, '').replace(new RegExp(Core.path.rootURL, 'g'), '');
 			
-		}
-
-		/**
-		  * Debug backtrace
-		  * @return {string} Backtrace debug
-		  */
-
-		this.debug = function() {
-
-			var html = '';
-
-			for(var frame = arguments.callee, stale = []; frame; frame = frame.caller) {
-				if(stale.indexOf(frame) >= 0)
-					break;
-
-				stale.push(frame);
-
-				html += '<br /><details><summary>' + (frame.name || '[unknown]') + '</summary>' + frame.toString() + '</details>';
-			}
-
-			return html;
-
-		}
+		};
 
 		/**
 		 * Know the caller of the last function
@@ -870,7 +913,7 @@ var Core = new function() {
 
  	 	this.getCaller = function() {
  	 		return arguments.callee.caller.arguments.callee.caller;
- 	 	}
+ 	 	};
 	}
 
  	/**
@@ -907,7 +950,7 @@ var Core = new function() {
 			} else
 				return false;
 
-		}
+		};
 
 		/**
 		  * Convert a NightPath to regex
@@ -943,49 +986,7 @@ var Core = new function() {
 
 			return path;
 
-    	}
-
-		// delete this function !
-
-		/*this.old_format = function(path, formatSelectors, disableVariables) {
-
-			// correct the next bug :
-			// when chdir in /users/admin/documents/App
-			// and format '../..'
-			// relative result is : '/' insteadof '/users/admin'
-
-			if(path.replace(this.root, '') === '/*' && formatSelectors)
-				return new RegExp(this.root.formatToRegex() + '($|\/(.*))')
-
-			var vars = Core.vars.vars();
-
-			path = r_path.normalize(path).replace(/\.\./g, '');
-
-			var c = (path.substr(0, 1) !== '/') ? process.cwd() : Core.path.root;
-
-			regex = (c + '/' + path.replace(Core.path.root, '')).replace(/^\\/g, '/');
-
-			if(!disableVariables)
-				for(var i in vars)
-					regex = regex.replace(new RegExp('\\$' + i + '\\$', 'gi'), vars[i]);
-
-			//console.log(regex);
-			regex = regex.replace(/[^a-zA-Z0-9 \.\-_\/\?\*]/g, '');
-			//console.log(regex);
-
-			if(formatSelectors) {
-				regex = regex.replace(/\/(|\*)$/, '').formatToRegex() + '($|\/\\*)';
-				regex = regex.replace(/\\\*/
-					/*g, '([a-zA-Z0-9 _\\-\\/]*)').replace(/\\\?/g, '.');
-			} else
-				regex = regex.replace(/\*/
-					/*g, '').replace(/\?/g, '');
-
-			regex = r_path.normalize(regex);
-
-			return formatSelectors ? new RegExp(regex, 'g') : regex;
-
-		}*/
+    	};
 
 		/**
 		  * Know if a path is in a NightPath
@@ -998,13 +999,45 @@ var Core = new function() {
 
 			return this.format(selector, true).test(Core.path.format(path));
 
-		}
+		};
 
-		this.rootURL = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')).substr(1);
+		this.rootURL = window.location.href.replace(/\/system\/system\.html$/, '');
 		
 		this.root = (typeof(appLauncherRootPath) !== 'undefined') ? appLauncherRootPath : process.cwd();
 
 	}
+
+    /* Etablish command-line queue */
+
+    this.vars.set('last_cmd_sync', null);
+    this.vars.set('last_cmd_resolve', true);
+
+    this.vars.watch('last_cmd_resolve', function(old, newest) {
+
+        if(newest) {
+
+            var cmds = Core.vars.get('cmd_queue');
+
+            if (cmds.length) {
+                var cmd = cmds[0];
+                cmds.shift();
+                Core.vars.set('cmd_queue', cmds);
+                Core.commandLine.exec(cmd, Core.vars.get('cmd_queue_console'), cmds.length);
+            }
+
+        }
+
+    });
+
+    this.vars.set('cmd_queue_console', null);
+    this.vars.set('cmd_queue', []);
+
+    this.vars.watch('cmd_queue', function(old, newest) {
+
+        if(!old.length && newest.length && Core.vars.get('last_cmd_resolve'))
+            Core.vars.set('last_cmd_resolve', true);
+
+    });
 
 	/**
 	  * Core.commandLine constructor
@@ -1039,91 +1072,6 @@ var Core = new function() {
 
 			},
 
-			write: function(args, con) {
-
-				if(App.writeFile(args[0], args[1]))
-					con.write('Writed successfull !')
-				else if(App.lastStack(-1))
-					con.error('Needs privileges elevation');
-				else
-					con.error('An error has occured.');
-
-			},
-
-			read: function(args, con) {
-
-				var f = App.readFile(args[0])
-
-				if(f !== false)
-					con.write(f);
-				else if(App.lastStack(-1))
-					con.error('Needs privileges elevation');
-				else
-					con.error('An error has occured.');
-
-			},
-
-			delete: function(args, con) {
-
-				if(App.removeFile(args[0]))
-					con.write('Deleted successfull !');
-				else if(App.lastStack(-1))
-					con.error('Needs privileges elevation');
-				else
-					con.error('An error has occured.');
-
-			},
-
-			mkdir: function(args, con) {
-
-				if(App.makeDir(args[0]))
-					con.write('Writed successfull !');
-				else if(App.lastStack(-1))
-					con.error('Needs privileges elevation');
-				else
-					con.error('An error has occured.');
-
-			},
-
-			rmdir: function(args, con) {
-
-				if(App.removeDir(args[0]))
-					con.write('Writed successfull !');
-				else if(App.lastStack(-1))
-					con.error('Needs privileges elevation');
-				else
-					con.error('An error has occured.');
-
-			},
-
-			ls: function(args, con) {
-
-				if(args[0] === '-d' || args[0] === '--details') {
-
-					var path = (args[1] || '.');
-					var f    = App.readDir(path);
-
-					html = '';
-
-					for(var i in f)
-						html += '<tr><td>' + (App.fileExists(f[i]) ? 'f' : 'd') + '</td><td>&nbsp;' + (App.fileExists(f[i]) ? App.getFileSize(path + '/' + f[i]) : '-') + '</td><td>&nbsp;' + f[i] + '</td></tr>';
-
-					return con.write('<table>' + html + '</table>');
-
-				}
-
-				var f = App.readDir((args[0] || '.'));
-
-				if(f)
-					con.text(f.join("\n"))
-				else if(App.lastStack(-1))
-					con.error('Needs privileges elevation');
-				else
-					con.error('An error has occured.');
-
-
-			},
-
 			chdir: function(args, con) {
 
 				if(args[0])
@@ -1136,122 +1084,77 @@ var Core = new function() {
 
 			},
 
-			debug: function(args, con) {
-
-				con.write('Rights : ' + App.getCertificate().getRights());
-
-			},
-
-			js: function(args, con) {
-
-				try { con.write(new Function(args[0])()) }
-				catch(e) { con.error('An error has occured : ' + new String(e)); }
-
-			},
-
-			exists: function(args, con) {
-
-				if(!args[0])
-					return con.error('Missing path');
-
-				con.write(App.exists(args[0]) ? 'true' : 'false');
-
-			},
-
-			fexists: function(args, con) {
-
-				if(!args[0])
-					return con.error('Missing path');
-
-				con.write(App.fileExists(args[0]) ? 'true' : 'false');
-
-			},
-
-			dexists: function(args, con) {
-
-				if(!args[0])
-					return con.error('Missing path');
-
-				con.write(App.directoryExists(args[0]) ? 'true' : 'false');
-
-			},
-
-			copy: function(args, con) {
-
-				if(!args[0] || !args[1])
-					return con.error('Missing arguments');
-
-				con.write('Copying...');
-
-				if(App.copyFile(args[0], args[1]))
-					con.write(' - Done !', true);
-				else if(App.lastStack(-1))
-					con.error('Needs privileges elevation');
-				else
-					con.error('An error has occured');
-
-			},
-
-			move: function(args, con) {
-
-				if(!args[0] || !args[1])
-					return con.error('Missing arguments');
-
-				con.write('Moving...');
-
-				if(App.moveFile(args[0], args[1]))
-					con.write(' - Done !', true);
-				else if(App.lastStack(-1))
-					con.error('Needs privileges elevation');
-				else
-					con.error('An error has occured');
-
-			}
+            exit: function() {
+                App.events.on('quit')();
+            }
 
 		}
 
 		/**
 		  * Get all native NightOS commands
-		  * @return {Object} Native NightOS commands
+		  * @returns {Object} Native NightOS commands
 		  */
 
-		this.getNative = function() { return native; }
+		this.getNative = function() { return native; };
 
 		/**
 		  * Execute a NightOS command
 		  * @param {string} cmd NightOS command
 		  * @param {Console} con The console instance
-		  * @return {string}
+          * @param {boolean} [disableInvite]
+		  * @returns {string|boolean}
 		  */
 
-		this.exec = function(cmd, con) {
+		this.exec = function(cmd, con, disableInvite) {
+
+            if(!cmd) {
+                if(Core.vars.get('last_cmd_resolve'))
+                    Core.vars.set('last_cmd_resolve', true);
+
+                return false;
+            }
+
+            function createCallback(content) {
+                return new Function(['output', 'arg_index', 'args', 'short_args', 'long_args'], 'function arg(short, long) { return (short_args[short] || long_args[long]); }\nfunction END() { Core.vars.set("last_cmd_sync", def("sync")); if(!def("disableInvite")) { output.invite(); } Core.vars.set("last_cmd_resolve", true); }\n' + content + "\nrun();");
+            }
 
 			if(!(con instanceof Console))
-				var con = new Console($(document.createElement('div')));
+                con = new Console($(document.createElement('div')));
 
-			var cmds = cmd.split('&&');
+            if(typeof(cmd) !== 'string')
+                return false;
 
-			// && chars doesn't works, correct that !
+            var cmds = cmd.replace(/\n|\r/g, '&&').replace(/(&&){2,}/g, '&&').split('&&');
 
 			if(cmds.length > 1) {
-				for(var i in cmds)
-					this.exec(cmds[i], con)
-
-				return;
+                Core.vars.set('cmd_queue_console', con);
+                Core.vars.set('cmd_queue', Core.vars.get('cmd_queue').concat(cmds));
+				return '';
 			}
 
 			con.noinvite();
 
-			var args = cmd.trim().replace(/ "(.*?)"/g, "\n$1").split("\n");
+			var args = cmd.trim().replace(/ "(.*?)" /g, '\n$1\n').replace(/ "(.*?)"/g, "\n$1").split("\n");
 			var n = args[0];
 
 			args.splice(0, 1);
 			args = n.split(' ').concat(args);
-			
+
 			var cmd_name = args[0];
-			
+
 			args.splice(0, 1);
-			
+
+            console.log(args);
+
+            for(var i in args)
+                args[i] = args[i].replace(/\-([0-9a-zA-Z])([0-9a-zA-Z])/g, function(match, first, last) {
+                    args.push('-' + last);
+                    return '-' + first;
+                });
+
+            console.log(args);
+            console.log('---');
+
 			var alias = Registry.read('commands/alias');
 
 			if(typeof(native[cmd_name]) !== 'function')
@@ -1271,37 +1174,94 @@ var Core = new function() {
 
 			if(typeof(native[cmd_name]) !== 'function') {
 
-				var app = Core.applications.get(cmd_name);
+                var sys_cmd;
+                var short_args = {};
+                var long_args  = {};
 
-				def('sync', true);
+                for(var i in args)
+                    if(args[i].substr(0, 2) == '--') {
+                        long_args[args[i].substr(2).replace(/=(.*)$/, '')] = (args[i].indexOf('=') != -1) ? args[i].substr(args[i].indexOf('=') + 1) : true;
+                    } else if(args[i].substr(0, 1) == '-') {
+                        short_args[args[i].substr(1).replace(/=(.*)$/, '')] = (args[i].indexOf('=') != -1) ? args[i].substr(args[i].indexOf('=') + 1) : true;
+                    }
 
-				if(app) {
-					def('nextcmd', app);
-					def('nextcon', con);
-					def('nextargs', args);
-					
-					if(!app.isSystem)
-						Dialogs.confirm('Command line interpreter', 'The command you will run will be use the current application rights. Continue uniquely if you\'re sure about what you are doing.', function() {
-							new Function(['con', 'args'], def('nextcmd').commandLine)(def('nextcon'), def('nextargs'));
-						});
-					else
-						new Function(['con', 'args'], app.commandLine)(def('nextcon'), args);
+                if(sys_cmd = (App.readFile('/system/cmd/' + cmd_name + '.js'))) {
 
-					if(def('sync'))
-						con.invite();
+                    def('sync', true);
+                    def('disableInvite', disableInvite);
 
- 				} else {
-					con.error('Command not found : ' + cmd_name);
-					con.invite();
-				}
+                    Core.vars.set('last_cmd_resolve', false);
+
+                    createCallback(sys_cmd)(con, 0, args, short_args, long_args);
+
+                    Core.vars.set('last_cmd_sync', def('sync'));
+
+                    if(def('sync') && !disableInvite)
+                        con.invite();
+
+                } else {
+                    var app = Core.applications.get(cmd_name);
+
+                    def('sync', true);
+
+                    if (app && app.commandLine) {
+
+                        def('nextcb', createCallback(app.commandLine));
+                        def('nextcon', con);
+                        def('nextargs', args);
+                        def('nextshortargs', short_args);
+                        def('nextlongargs', long_args);
+                        def('disableInvite', disableInvite);
+
+                        if (!app.isSystem)
+                            Dialogs.confirm('Command line interpreter', 'The command you will run will be use the current application rights. Continue uniquely if you\'re sure about what you are doing.', function () {
+                                def('sync', true);
+
+                                Core.vars.set('last_cmd_resolve', false);
+
+                                def('nextcb')(def('nextcon'), 0, def('nextargs'), def('nextshortargs'), def('nextlongargs'));
+
+                                Core.vars.set('last_cmd_sync', sync);
+
+                                if(def('sync'))
+                                    Core.vars.set('last_cmd_resolve', sync);
+
+                                if(def('sync') && !def('disableInvite'))
+                                    def('nextcon').invite();
+                            });
+                        else {
+							var sync = true;
+
+                            Core.vars.set('last_cmd_resolve', false);
+
+                            def('nextcb')(con, 0, args, short_args, long_args);
+
+                            if(sync)
+                                Core.vars.set('last_cmd_sync', sync);
+
+                            if(sync && !disableInvite)
+                                con.invite();
+                        }
+                    } else {
+                        con.error('Command not found : ' + cmd_name);
+
+                        if(!disableInvite)
+                            con.invite();
+                    }
+                }
 			} else {
 				native[cmd_name](args, con);
-				con.invite();
+
+                Core.vars.set('last_cmd_sync', true);
+                Core.vars.set('last_cmd_resolve', true);
+
+                if(!disableInvite)
+    				con.invite();
 			}
 
 		}
 
-	}
+	};
 
 	this.fatalError = function(error, event) {
 	
@@ -1323,7 +1283,7 @@ var Core = new function() {
 			console.error('A loop error occured : ' + e.message);
 		}
 	
-	}
+	};
 
 	/**
 	  * Format a frame content to an HTML content
@@ -1411,7 +1371,7 @@ var Core = new function() {
 		catch(e) {
 			throw new Error('An error occured during loading UI [system/boot/app.js].<br /><br />' + e.message);
 		}
-	}
+	};
 
 	/**
 	  * The Core.frames constructor
@@ -1423,7 +1383,7 @@ var Core = new function() {
 		/**
 		  * Format a frame
 		  * @param {string} frame Frame content
-		  * @return {string} Formatted frame content
+		  * @returns {string} Formatted frame content
 		  */
 
 		this.format = function(frame) {
@@ -1435,64 +1395,11 @@ var Core = new function() {
 
 			return frame;
 
-		}
+		};
 
 	}
 
-	/**
-	  * The Core.vars constructor
-	  * @constructor
-	  */
-
-	this.vars = new function() {
-
-		var _vars = {};
-		var _constants = {};
-
-		/**
-		  * Set a variable. Please note that a variable can be assigned only one time.
-		  * @param {string} name Variable name
-		  * @param value Variable value
-		  * @return {Boolean} false if variable already exists
-		  */
-	
-		this.set = function(name, value, isConstant) {
-
-			if(typeof(_vars[name]) !== 'undefined')
-				return false;
-
-			_vars[name] = value;
-			_constants[name] = isConstant;
-			window['_' + name + '_'] = value;
-
- 			return true;
-
-		}
-
-		/**
-		  * Return a specific variable
-		  */
-
-		this.get = function(name) {
-
-			return _vars[name];
-
-		}
-
-		/**
-		  * Return all defined vars
-		  * @return {Object} vars All defined vars
-		  */
-
-		this.vars = function() {
-
-			return _vars;
-
-		}
-
-	}
-
-}
+};
 
 Object.freeze(Core);
 

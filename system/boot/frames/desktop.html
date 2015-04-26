@@ -21,7 +21,7 @@
 		var files = App.readDir('/users/$USER$/desktop');
 
 		if(typeof(files) !== 'object')
-			throw new Error('NightOS can\'t read the user desktop folder [/users/' + _user_ + '/desktop]. Please check that this directory is readable.');
+			throw new Error('NightOS can\'t read the user desktop directory [/users/' + _user_ + '/desktop]. Please check that this directory is readable.');
 
 		for(var i in files) {
 			var f = '/users/' + _user_ + '/desktop/' + files[i];

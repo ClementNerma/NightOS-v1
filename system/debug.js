@@ -6,6 +6,12 @@ var Debug = new function() {
 	var _errors = [];
 	var _infos  = [];
 
+	/**
+	 * Log a message
+     * @param {string} msg
+	 * @type {Function}
+	 */
+
 	this.log = this.write = function(msg) {
 
 		var args = [];
@@ -27,6 +33,12 @@ var Debug = new function() {
 
 	}
 
+    /**
+     * Display a warning message
+     * @param {string} msg
+     * @type {Function}
+     */
+
 	this.warn = function(msg) {
 
 		var args = [];
@@ -45,6 +57,12 @@ var Debug = new function() {
 		console.warn(msg);
 
 	}
+
+    /**
+     * Display an error message
+     * @param {string} msg
+     * @type {Function}
+     */
 
 	this.error = function(msg) {
 
@@ -67,6 +85,12 @@ var Debug = new function() {
 
 	}
 
+    /**
+     * Display an info message
+     * @param {string} msg
+     * @type {Function}
+     */
+
 	this.info = function(msg) {
 
 		var args = [];
@@ -88,9 +112,40 @@ var Debug = new function() {
 
 	}
 
-	this.logs = function() { return _logs; }
-	this.warns = function() { return _warns; }
-	this.errors = function() { return _errors; }
-	this.infos = function() { return _infos; }
+    /**
+     * Get all logs messages
+     * @returns {Array}
+     */
+
+    this.logs = function() {
+        return _logs;
+    }
+
+    /**
+     * Get all warning messages
+     * @returns {Array}
+     */
+
+    this.warns = function() {
+        return _warns;
+    }
+
+    /**
+     * Get all errors messages
+     * @returns {Array}
+     */
+
+    this.errors = function() {
+        return _errors;
+    }
+
+    /**
+     * Get all infos messages
+     * @returns {Array}
+     */
+
+    this.infos = function() {
+        return _infos;
+    }
 
 }

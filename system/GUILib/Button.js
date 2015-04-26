@@ -14,7 +14,7 @@ var Button = function(text, onclick) {
 	/**
 	  * Change the label of the button
 	  * @param {string} text The label of the button
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.setText = function(text) {
@@ -33,7 +33,7 @@ var Button = function(text, onclick) {
 
 	/**
 	  * Get the current label of the buttin
-	  * @return {string}
+	  * @returns {string}
 	  */
 
 	this.text = function() {

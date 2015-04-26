@@ -1,7 +1,22 @@
+/**
+ * AES engine
+ * @type {AES}
+ * @constructor
+ */
 
-var AES = window.AES = new function() {
+var AES = new function() {
 	
 	var _r = require;
+
+    /**
+     * Encrypt a text with AES algorithm
+     * @param {string} decrypted The text to crypt
+     * @param {string} key The 256-bytes length key
+     * @param {number} iv The initialisation vector
+     * @param {string} inputEncoding The input encoding format (hex, binary...)
+     * @param {string} outputEncoding The output encoding format (hex, binary...)
+     * @returns {string}
+     */
 	
 	this.encrypt = function(decrypted, key, iv, inputEncoding, outputEncoding) {
 		/*key and iv must be either binary encoded strings (deprecated) or buffers
@@ -20,6 +35,16 @@ var AES = window.AES = new function() {
 		return encrypted;
 	};
 
+    /**
+     * Decrypt an encrypted message with AES algorithm
+     * @param {string} encrypted The encrypted message
+     * @param {string} key The 256-bytes length key
+     * @param {number} iv The initialisation vector
+     * @param {string} inputEncoding The input encoding format (hex, binary...)
+     * @param {string} outputEncoding The output encoding format (hex, binary...)
+     * @returns {string}
+     */
+
 	this.decrypt = function(encrypted, key, iv, inputEncoding, outputEncoding) {
 		/*key and iv must be either binary encoded strings (deprecated) or buffers
 		inputEncoding must be either 'ascii', 'utf8', 'binary' or undefined
@@ -37,8 +62,14 @@ var AES = window.AES = new function() {
 		return decrypted;
 	};
 
+    /**
+     * Generate an AES key (default : 256-bytes)
+     * @param {number} [length]
+     * @returns {boolean|Buffer}
+     */
+
 	this.generateKey = function(length) {
-		/* length is in bits
+		/* length is in bytes
 		This function returns a buffer */
 		
 		var crypto = _r('crypto');
@@ -54,9 +85,15 @@ var AES = window.AES = new function() {
 
 		return key;
 	};
+
+    /**
+     * Generate an AES initialization vector (default : 128-bytes)
+     * @param {number} [length]
+     * @returns {boolean|Buffer}
+     */
 	
 	this.generateIV = function(length) {
-		/* length is in bits
+		/* length is in bytes
 		This function returns a buffer */
 		
 		var crypto = _r('crypto');

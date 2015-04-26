@@ -31,7 +31,7 @@ var Registry = new function() {
 	/**
 	  * Return a registry entry
 	  * @param {string} path Registry path
-	  * @return {string|Boolean|Array|Object} Registry entry
+	  * @returns {string|Boolean|Array|Object} Registry entry
 	  */
 
 	this.read = function(path) {
@@ -49,7 +49,7 @@ var Registry = new function() {
 	  * Write a registry entry
 	  * @param {string} path Registry path
 	  * @param {string|Boolean|Array|Object} value Entry value
-	  * @return {Boolean} false if failed, true if success
+	  * @returns {Boolean} false if failed, true if success
 	  */
 
 	this.write = function(path, value) {

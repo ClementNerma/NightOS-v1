@@ -25,7 +25,7 @@ var MenuBar = function() {
 
 	/**
 	  * Know if the element is visible
-	  * @return {Number} Return 0 or 1
+	  * @returns {Number} Return 0 or 1
 	  */
 
 	this.visible = function() {
@@ -37,7 +37,7 @@ var MenuBar = function() {
 	/**
 	  * Add a MenuElement object to the menu bar
 	  * @param {MenuElement} element
-	  * @return {Boolean}
+	  * @returns {Boolean}
 	  */
 
 	this.addElement = function(element) {

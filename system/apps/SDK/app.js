@@ -41,17 +41,17 @@ function createProject(template, location) {
 	} else {
 
 		if(App.directoryExists(location))
-			return Dialogs.error('SDK - Cannot create project', 'This folder already exists. Please specify a non-existant path.');
+			return Dialogs.error('SDK - Cannot create project', 'This directory already exists. Please specify a non-existant path.');
 
 		if(!App.makeDir(location))
-			return Dialogs.error('SDK - Cannot make specified folder' + (App.lastStack(-1) ? '<br />Needs privileges elevation' : ''));
+			return Dialogs.error('SDK - Cannot make specified directory' + (App.lastStack(-1) ? '<br />Needs privileges elevation' : ''));
 
 		var tpl_loc = '/users/common-data/appdata/SDK/templates/' + template;
 
 		var files = App.readDir(tpl_loc);
 
 		if(!files)
-			return Dialogs.error('SDK - Cannot read template folder', 'Cannot read <b>' + template + '</b> template folder');
+			return Dialogs.error('SDK - Cannot read template directory', 'Cannot read <b>' + template + '</b> template directory');
 
 		var copy_err = [];
 
@@ -60,7 +60,7 @@ function createProject(template, location) {
 				copy_err.push(files[i]);
 
 		if(copy_err.length)
-			Dialogs.error('SDK - Cannot copy template files', 'The following files has not been copied to the project folder :<br /><br />' + copy_err.join('<br />') + '<br /><br />');
+			Dialogs.error('SDK - Cannot copy template files', 'The following files has not been copied to the project directory :<br /><br />' + copy_err.join('<br />') + '<br /><br />');
 		else {
 			location = Core.path.format(location).replace(Core.path.format, '').replace(/\/$/g, '');
 			p_ini[location.split('/')[location.split('/').length - 1]] = location;
@@ -345,7 +345,7 @@ con.on('error', function() {
 
 con.on('invite', function() {
 
-	con.write('<br /><div id="build-log-closer" OnClick="$(\'#build-log\').hide().html(\'\')">Close</div>' + (buildError ? '' : ' <div id="build-log-opener" OnClick="openBuiltApp();">Open app folder</div>'));
+	con.write('<br /><div id="build-log-closer" OnClick="$(\'#build-log\').hide().html(\'\')">Close</div>' + (buildError ? '' : ' <div id="build-log-opener" OnClick="openBuiltApp();">Open app directory</div>'));
 
 });
 

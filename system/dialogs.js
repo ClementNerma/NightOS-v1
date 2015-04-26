@@ -143,7 +143,7 @@ var Dialogs = new function() {
 
 	/**
 	  * Get callback function (for input dialogs)
-	  * @return {function} callback
+	  * @returns {function} callback
 	  */
 
 	this.callback = function() {

@@ -44,7 +44,7 @@ function val2str(value) {
 
 /**
   * Delete non-base 64 chars
-  * @return {string}
+  * @returns {string}
   */
 
 String.prototype.toBase64 = function() {
@@ -53,7 +53,7 @@ String.prototype.toBase64 = function() {
 
 /**
   * Delete HTML tags
-  * @return {string}
+  * @returns {string}
   */
 
 String.prototype.toPlainText = function() {
@@ -62,7 +62,7 @@ String.prototype.toPlainText = function() {
 
 /**
   * Escape HTML chars
-  * @return {string}
+  * @returns {string}
 */
 
 String.prototype.escapeHTML = function() {
@@ -82,7 +82,7 @@ String.prototype.escapeHTML = function() {
 /**
   * Return true if the string contains the specified string
   * @param {string} str
-  * @return {Boolean}
+  * @returns {Boolean}
   */
 
 String.prototype.contains = function(str) {
@@ -92,7 +92,7 @@ String.prototype.contains = function(str) {
 /**
   * Return true if the string contains one of the specified strings
   * @param {array} arr The string arrays
-  * @return {Boolean}
+  * @returns {Boolean}
   */
 
 String.prototype.containsOne = function(arr) {
@@ -109,7 +109,7 @@ String.prototype.containsOne = function(arr) {
 /**
   * Explode the string to blocks
   * @param {number} size The size of each block
-  * @return {array} Blocks
+  * @returns {array} Blocks
   */
 
 String.prototype.blocks = function(size) {
@@ -155,7 +155,7 @@ Function.prototype.toSource = function() {
 /**
   * Add a function to the end of the function
   * @param {function} end The function to add
-  * @return {function} The fusionned functions
+  * @returns {function} The fusionned functions
   */
 
 Function.prototype.fusion = function(end) {

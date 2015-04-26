@@ -3,6 +3,6 @@
 	"name": "NightOS",
 
 	"window": {
-		"toolbar": false
+		"toolbar": true
 	}
 }

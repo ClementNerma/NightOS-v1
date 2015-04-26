@@ -114,6 +114,7 @@
             "readable": [
                 "/system/boot/*",
                 "/system/apps/*",
+                "/system/cmd/*",
                 "/apps/*",
                 "/libs/*",
                 "/users/common-data/*"
@@ -166,5 +167,7 @@
 
             "ls": []
         }
-    }
+    },
+
+    "applications": {}
 }
