@@ -20,15 +20,16 @@ var Consoles = new function() {
 
 var Console = function(context, setDefaultInvite, readOnly) {
 
-	var _console  = $(context)[0];
-	var _prompt   = '$' + String.fromCharCode(160);
-	var _id       = Consoles.inc();
-	var _history  = [];
-	var _start    = null;
-	var _invite   = false;
-	var _readOnly = false;
-	var _h        = false;
-	var _events   = {
+	var _console     = $(context)[0];
+	var _prompt      = '$' + String.fromCharCode(160);
+	var _id          = Consoles.inc();
+	var _history     = [];
+	var _start       = null;
+	var _invite      = false;
+	var _readOnly    = false;
+	var _h           = false;
+    var _redirection = false;
+	var _events      = {
 		write: function() {},
 		warn: function() {},
 		error: function() {},
@@ -67,7 +68,7 @@ var Console = function(context, setDefaultInvite, readOnly) {
 		if(e.keyCode === 38) {
 			if(_h)
 				_h -= 1;
-			_console.lastChild.innerText = _history[_h];
+			_console.lastChild.innerText = (_history[_h] || '');
 			return false;
 		}
 
@@ -78,7 +79,7 @@ var Console = function(context, setDefaultInvite, readOnly) {
 			_console.lastChild.setAttribute('contenteditable', false);
 
 			if(!cmd) {
-				this.noinvite();
+				this.noInvite();
 				this.invite();
 				return false;
 			}
@@ -110,8 +111,12 @@ var Console = function(context, setDefaultInvite, readOnly) {
 
 	this.write = function(text, noJump) {
 
-		_console.innerHTML += (noJump ? '' : '<br />') + text;
-		this.on('write')(text);
+        if(!_redirection)
+            _console.innerHTML += (noJump ? '' : '<br />') + text;
+        else
+            App.appendFile(_redirection, (noJump ? '' : '\n') + text);
+
+        this.on('write')(text);
 
 	}
 
@@ -123,8 +128,12 @@ var Console = function(context, setDefaultInvite, readOnly) {
 
 	this.text = function(text, noJump) {
 
-		_console.innerHTML += (noJump ? '' : '<br />') + text.escapeHTML().replace(/ /g, String.fromCharCode(160)).replace(/\\n|\\r/g, '<br/>').replace(/\n|\r/g, '<br/>');
-		this.on('write')(text);
+        if(!_redirection)
+            _console.innerHTML += (noJump ? '' : '<br />') + text.escapeHTML().replace(/ /g, String.fromCharCode(160)).replace(/\\n|\\r/g, '<br/>').replace(/\n|\r/g, '<br/>');
+        else
+            App.appendFile(_redirection, (noJump ? '' : '\n') + text);
+
+			this.on('write')(text);
 
 	}
 
@@ -136,7 +145,11 @@ var Console = function(context, setDefaultInvite, readOnly) {
 
     this.success = function(text, noJump) {
 
-        _console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: green;">' + text + '</span>';
+        if(!_redirection)
+            _console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: green;">' + text + '</span>';
+        else
+            App.appendFile(_redirection, (noJump ? '' : '\n') + text);
+
         this.on('success')(text);
 
     }
@@ -149,8 +162,12 @@ var Console = function(context, setDefaultInvite, readOnly) {
 
 	this.warn = function(text, noJump) {
 
-		_console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: yellow;">' + text + '</span>';
-		this.on('warn')(text);
+        if(!_redirection)
+            _console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: yellow;">' + text + '</span>';
+        else
+            App.appendFile(_redirection, (noJump ? '' : '\n') + text);
+
+        this.on('warn')(text);
 
 	}
 
@@ -162,8 +179,12 @@ var Console = function(context, setDefaultInvite, readOnly) {
 
 	this.error = function(text, noJump) {
 
-		_console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: red;">' + text + '</span>';
-		this.on('warn')(text);
+        if(!_redirection)
+            _console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: red;">' + text + '</span>';
+        else
+            App.appendFile(_redirection, (noJump ? '' : '\n') + text);
+
+        this.on('error')(text);
 		return false;
 
 	}
@@ -180,10 +201,31 @@ var Console = function(context, setDefaultInvite, readOnly) {
 	}
 
     /**
+     * Redirect console output to file
+     * @param {string} file
+     * @param {boolean} [erase] Clear the output file before writing
+     */
+
+    this.setRedirection = function(file, erase) {
+        if(erase)
+            App.writeFile(file, '');
+
+        _redirection = file;
+    }
+
+    /**
+     * Disable file redirection
+     */
+
+    this.noRedirection = function() {
+        var _redirection = false;
+    }
+
+    /**
      * Disable console input
      */
 
-	this.noinvite = function() {
+	this.noInvite = function() {
 
 		_invite = false;
 		this.on('no-invite')();

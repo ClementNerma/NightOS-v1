@@ -2,8 +2,8 @@
 /**
   * Generate a button for the application GUI
   * @constructor
-  * @param {string} text [Optionnal] The label of the button
-  * @param {Function} onclick [Optionnal] Callback for the 'click' event
+  * @param {string} text [optional] The label of the button
+  * @param {Function} onclick [optional] Callback for the 'click' event
   */
 
 var Button = function(text, onclick) {

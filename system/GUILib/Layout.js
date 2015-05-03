@@ -18,8 +18,8 @@ var Layout = function() {
 	  * @param {Object} The element you want to add to the layout. It must be a GUI widget, such as TextEdit, etc.
 	  * @param {Number} X The X position of the element
 	  * @param {Number} Y The Y position of the element
-	  * @param {Number} width [Optionnal] The element width
-	  * @param {Number} height [Optionnal] The element height
+	  * @param {Number} width [optional] The element width
+	  * @param {Number} height [optional] The element height
 	  */
 
 	this.append = function(element, X, Y, width, height) {

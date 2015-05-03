@@ -1,85 +1,85 @@
 
-if(!args[0])
-	return con.error('Invalid argument. Please see apkg --help for more informations');
+function run() {
 
-if(args[0] == '--help')
-	return con.text("The NightOS application package manager permit to install, get or remove applications from your computer.\n"
-					+"apkg install [name | -f file | --file file]\n"
-					+"    install an application from NightOS repositories or from a file\n"
-					+"    -f Install an application from a local file\n\n"
-					+"apkg remove [name]\n"
-					+"    remove an application\n"
-				);
+    if (args[0] === 'install') {
 
-if(args[0] == 'install') {
+        // Install an application
 
-	// Install an application
+        if (arg('f', 'file')) {
 
-	if(!args[1])
-		return con.error('No application or file specified');
+            // Install the application from a file
 
-	if(args[1] == '-f' || args[1] == '--file') {
+            if (!args[2])
+                return output.error('No application file specified');
 
-		// Install the application from a file
+            var app = App.readFile(args[2]);
 
-		if(!args[2])
-			return con.error('No application file specified');
+            if (!app)
+                return App.lastStack(-1) ? output.error('Can\'t access to the specified file because it\'s needs privileges elevation') : output.error('The specified file was not found');
 
-		var app = App.readFile(args[2]);
+            /*if (!Core.applications.isValidPackage(app))
+                return output.error('The specified file is not a valid application package');
 
-		if(!app)
-			return App.lastStack(-1) ? con.error('Can\'t access to the specified file because it\'s needs privileges elevation') : con.error('The specified file was not found');
+            if (!Core.applications.isSignedPackage(app))
+                output.warn('The application package is not signed. This can cause security issues');*/
+            // Don't show that because the Core installer display these warn
 
-		if(!Core.applications.isValidPackage(app))
-			return con.error('The specified file is not a valid application package');
+            return Core.applications.installFromPackage(app, con);
 
-		if(!Core.applications.isSignedPackage(app))
-			con.warn('The application package is not signed. This can cause security issues');
+        } else {
 
-		return Core.applications.installFromPackage(app, con);
+            if(!args[1])
+                return output.error('Missing application name');
 
-	} else {
+            // Install the application from a NightOS repository (require internet connection)
 
-		// Install the application from a NightOS repository (require internet connection)
+            def('sync', false);
 
-	}
+            Core.applications.installFromServer(args[1], output, function() {
+                END();
+            }, function() {
+                END();
+            });
 
-} else if(args[0] == 'remove') {
+        }
 
-	// Remove an application
+    } else if (args[0] === 'remove') {
 
-	if(!args[1])
-		return con.error('No application name specified');
+        // Remove an application
 
-	if(!Core.applications.exists(args[1]))
-		return con.error('The application [' + args[1].escapeHTML() + '] is not installed on this computer');
+        if (!args[1])
+            return output.error('No application name specified');
 
-	// can remove the application
+        if (!Core.applications.exists(args[1]))
+            return output.error('The application [' + args[1].escapeHTML() + '] is not installed on this computer');
 
-} else if(args[0] === 'installed') {
+        return Core.applications.remove(args[1], output);
 
-	// Check if an application is installed
+    } else if (args[0] === 'installed') {
 
-	if(!args[1])
-		return con.error('No application name specified');
+        // Check if an application is installed
 
-	return con.text(Core.applications.exists(args[1]).toString());
+        if (!args[1])
+            return output.error('No application name specified');
 
-} else if(args[0] === 'launch') {
+        return output.text(Core.applications.exists(args[1]).toString());
 
-	// Launch an application
+    } else if (app = arg('l', 'launch')) {
 
-	if(!args[1])
-		return con.error('No application name specified');
+        // Launch an application
 
-	if(!Core.applications.exists(args[1]))
-		return con.error('The application [' + args[1].escapeHTML() + '] is not installed on this computer');
+        if (!app)
+            return output.error('No application name specified');
 
-	return Core.applications.launch({
-		origin: 'CommandLine',
-		from: 'ApplicationPackage'
-	});
+        if (!Core.applications.exists(app))
+            return output.error('The application [' + app.escapeHTML() + '] is not installed on this computer');
 
-} else
-	return con.error('Invalid parameters.<br />See apkg --help for more informations.');
+        return Core.applications.launch(app, {
+            origin: 'CommandLine',
+            from: 'ApplicationPackage'
+        });
 
+    } else
+        return output.error('Invalid parameters.<br />See apkg --help for more informations.');
+
+}

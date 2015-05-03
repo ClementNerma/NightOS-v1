@@ -1,4 +1,12 @@
 
+/**
+ * Clone an object (permit to modify the cloned object without modifying the original object)
+ * @param {object} e
+ * @returns {object}
+ */
+
+function clone(e){var n;if(null==e||"object"!=typeof e)return e;if(e instanceof Date)return n=new Date,n.setTime(e.getTime()),n;if(e instanceof Array){n=[];for(var t=0,r=e.length;r>t;t++)n[t]=clone(e[t]);return n}if(e instanceof Object){n={};for(var o in e)e.hasOwnProperty(o)&&(n[o]=clone(e[o]));return n}throw new Error("Unable to copy obj! Its type isn't supported.")}
+
 var define = new function() {
 
 	var vars = {};
@@ -96,7 +104,7 @@ var Core = new function() {
          * @returns {Object} vars All defined vars
          */
 
-        this.vars = function() {
+        this.all = function() {
 
             return _vars;
 
@@ -387,7 +395,7 @@ var Core = new function() {
 		 * @param {string} name Application name
 		 * @param {Object} args Arguments to pass to application instance
 		 * @param {string} adminPass The administrator password. Needed to launch high-level applications.
-		 * @returns {Number}
+		 * @returns {boolean}
 		 */
 
 		this.launch = function(name, args, runAsAdmin, adminPass) {
@@ -504,11 +512,36 @@ var Core = new function() {
 
 				};
 
-				this.contentWindow.installPackageApp = function(package, con) {
+                this.contentWindow.sysApp = {};
 
-					return Core.applications.installFromPackage(package, con);
+                if(App.getCertificate().getRights() >= 3) {
 
-				};
+                    this.contentWindow.sysApp.installPackageApp = function (package, con) {
+
+                        return Core.applications.installFromPackage(package, con);
+
+                    };
+
+                    this.contentWindow.sysApp.installServerApp = function (name, con, success, error) {
+
+                        return Core.applications.installFromServer(name, con, success, error);
+
+                    };
+
+                    this.contentWindow.sysApp.removeApp = function (name, con) {
+
+                        return Core.applications.remove(name, con);
+
+                    }
+
+                } else {
+
+                    this.contentWindow.sysApp.installFromPackageApp = this.contentWindow.sysApp.installServerApp = this.contentWindow.sysApp.removeApp = function(ignore, con) {
+                        (con || console).error('SysApp : Not enough rights');
+                        return false;
+                    }
+
+                }
 
 				this.contentWindow.sys = {
 					quitApp: function(name, frame_ID) {
@@ -523,7 +556,7 @@ var Core = new function() {
 
 				};
 
-				this.contentWindow.launch(name, args, Core.vars.vars(), Core.applications.frames[name], Core.applications.frames[name][id].win, Core.applications.frames[name][id].cert, id, Core.path.root, require, process, Buffer);
+				this.contentWindow.launch(name, args, Core.vars.all(), Core.applications.frames[name], Core.applications.frames[name][id].win, Core.applications.frames[name][id].cert, id, Core.path.root, require, process, Buffer);
 				this.contentWindow.readyToLaunch = true;
 			});
 			
@@ -695,7 +728,7 @@ var Core = new function() {
 		/**
 		  * Install an application from a package
 		  * @param {Object} package Application package
-		  * @param {Object} con [Optionnal] The output debug console
+		  * @param {Object} con [optional] The output debug console
 		  * @returns {Boolean} Return true if the installation success
 		  */
 
@@ -788,9 +821,106 @@ var Core = new function() {
 
 		this.installFromPackage = function(package, con) {
 
-			return installPackageApp(package, con);
+            sysApp.installPackageApp(package, con);
 
 		}
+
+        /**
+         * Install an application from server
+         * @param {string} name
+         * @param {Console} con
+         * @param {function} [success]
+         * @param {function} [error]
+         */
+
+		this.installFromServer = function(name, con, success, error) {
+
+            if(def('server_install_request')) {
+                con.error('The system is already installing an application');
+                error(0);
+            }
+
+            def('server_install_requesting', true);
+
+            def('server_install_con', con);
+            def('server_install_success', (success || function(){}));
+            def('server_install_error', (error || function(){}));
+
+            con.text('Requesting server...');
+
+            return request('http://nightos.890.com/backend/get.php?name=' + name, function(error, response, body) {
+
+                var output = def('server_install_con');
+                var err;
+
+                if(!error && response.statusCode === 200) {
+                    try { if(err = JSON.parse(body).error) {
+                        output.error('Error : ' + err);
+                        return def('server_install_error')(0);
+                    } }
+                    catch(e) {}
+
+                    Core.applications.installFromPackage(body, output);
+                    return def('server_install_success')();
+                }
+
+                if(response.statusCode === 404) {
+                    output.error('Repository not found (returned 404)');
+                    return def('server_install_error')(404);
+                }
+
+                if(response.statusCode === 403) {
+                    output.error('Repository forbidden access (returned 403)');
+                    return def('server_install_error')(403);
+                }
+
+                if(response.statusCode === 500) {
+                    output.error('Internal server error. Please try later (returned 500)');
+                    return def('server_install_error')(500);
+                }
+
+            });
+
+        };
+
+		if(typeof(appLauncher) !== 'undefined')
+
+		this.installFromServer = function(name, con, success, error) {
+
+			if(sysApp.installServerApp(name, con, success, error) === false)
+                error(-1);
+
+		};
+
+        /**
+         * Remove an application
+         * @param {string} name
+         * @param {Console} con
+         */
+
+        this.remove = function(name, con) {
+
+            if(!this.exists(name))
+                return con.error('This application is not installed');
+
+            App.removeDir('/apps/' + name);
+
+            var a = Registry.read('applications');
+            delete a[name];
+
+            Registry.write('applications', a);
+
+            return con.success('Successfully removed application !');
+
+        }
+
+        if(typeof(appLauncher) !== 'undefined')
+
+        this.remove = function(name, con) {
+
+            sysApp.removeApp(name, con);
+
+        }
 
 	};
 
@@ -962,7 +1092,7 @@ var Core = new function() {
     		if(path.replace(this.root, '') === '/*' && formatSelectors)
     			return new RegExp(this.root.formatToRegex() + '($|\/(.*))');
 
-    		var vars = Core.vars.vars();
+    		var vars = Core.vars.all();
 
     		path = path.replace(/[^a-zA-Z0-9 \-_\.\/\?\*\$]/g, '');
     		path = path.replace(Core.path.root, '');
@@ -1002,7 +1132,11 @@ var Core = new function() {
 		};
 
 		this.rootURL = window.location.href.replace(/\/system\/system\.html$/, '');
-		
+
+		/**
+		 * The system root path
+		 * @type {string}
+		 */
 		this.root = (typeof(appLauncherRootPath) !== 'undefined') ? appLauncherRootPath : process.cwd();
 
 	}
@@ -1021,6 +1155,7 @@ var Core = new function() {
             if (cmds.length) {
                 var cmd = cmds[0];
                 cmds.shift();
+                Core.vars.get('cmd_queue_console').noRedirection();
                 Core.vars.set('cmd_queue', cmds);
                 Core.commandLine.exec(cmd, Core.vars.get('cmd_queue_console'), cmds.length);
             }
@@ -1050,6 +1185,7 @@ var Core = new function() {
 
 		/**
 		  * Native NightOS commands
+          * @type {object}
 		  */
 
 		var native = {
@@ -1057,7 +1193,7 @@ var Core = new function() {
 			echo: function(args, con) {
 
 				var txt = args.join(' ');
-				var vars = Core.vars.vars();
+				var vars = Core.vars.all();
 
 				for(var i in vars)
 					txt = txt.replace(new RegExp('\\$' + i + '\\$', 'gi'), vars[i]);
@@ -1065,6 +1201,15 @@ var Core = new function() {
 				con.text(txt);
 
 			},
+
+            set: function(args, con) {
+
+                if(!args[0] || args[0].indexOf('=') === -1)
+                    con.error('Missing alias name and value');
+                else
+                    Core.vars.set(args[0].split('=')[0].trim(), args[0].split('=')[1].trim());
+
+            },
 
 			clear: function(args, con) {
 
@@ -1084,11 +1229,59 @@ var Core = new function() {
 
 			},
 
+            alias: function(args, con) {
+
+                if(!args[0])
+                    con.error('Missing alias name and value');
+                else if(args[0].indexOf('=') === -1) {
+                    if(_alias[args[0]])
+                        con.text(_alias[args[0]]);
+                    else
+                        con.error('Alias not found');
+                } else
+                    _alias[args[0].split('=')[0].trim()] = args[0].split('=')[1].trim();
+
+            },
+
+            macro: function(args, con) {
+
+                if(!args[0])
+                    con.error('Missing macro name and value');
+                else if(!args[1]) {
+                    if(_macros[args[0]])
+                        con.text(_macros[args[0]].join("\n"));
+                    else
+                        con.error('Macro not found');
+                } else {
+                    var m = args[1].trim();
+
+                    while (m.indexOf('&&') != -1)
+                        m = m.replace(/( *)&&( *)/g, '&&');
+
+                    _macros[args[0].trim()] = m.split('&&');
+
+                }
+            },
+
             exit: function() {
                 App.events.on('quit')();
             }
 
 		}
+
+        /**
+         * Shell alias
+         * @type {object}
+         */
+
+        var _alias = {};
+
+        /**
+         * Shell macros
+         * @type {object}
+         */
+
+        var _macros = {};
 
 		/**
 		  * Get all native NightOS commands
@@ -1107,34 +1300,72 @@ var Core = new function() {
 
 		this.exec = function(cmd, con, disableInvite) {
 
-            if(!cmd) {
-                if(Core.vars.get('last_cmd_resolve'))
-                    Core.vars.set('last_cmd_resolve', true);
+            Core.vars.set('last_cmd_resolve', false);
 
+            if(typeof(cmd) !== 'string')
+                return false;
+
+            cmd = cmd.replace(/#(.*?)$/gm, '');
+
+            if(!cmd) {
+                Core.vars.set('last_cmd_resolve', true);
                 return false;
             }
 
-            function createCallback(content) {
-                return new Function(['output', 'arg_index', 'args', 'short_args', 'long_args'], 'function arg(short, long) { return (short_args[short] || long_args[long]); }\nfunction END() { Core.vars.set("last_cmd_sync", def("sync")); if(!def("disableInvite")) { output.invite(); } Core.vars.set("last_cmd_resolve", true); }\n' + content + "\nrun();");
+            function createCallback(content, help) {
+                return new Function(['output', 'arg_index', 'args', 'short_args', 'long_args', 'data'], 'function arg(short, long) { return (short_args[short] || long_args[long]); }\nfunction END() { Core.vars.set("last_cmd_sync", def("sync")); if(!def("disableInvite")) { output.invite(); } Core.vars.set("last_cmd_resolve", true); }\n' + content + "\n" + (help ? 'if(typeof(help) === "object") { Core.commandLine.viewObjHelp(output, help); } else { run(); }' : 'run();'));
             }
 
 			if(!(con instanceof Console))
                 con = new Console($(document.createElement('div')));
 
-            if(typeof(cmd) !== 'string')
-                return false;
-
-            var cmds = cmd.replace(/\n|\r/g, '&&').replace(/(&&){2,}/g, '&&').split('&&');
+            var cmds = cmd.replace(/\r\n|\r|\n/g, '&&').replace(/(&&){2,}/g, '&&').split('&&');
 
 			if(cmds.length > 1) {
                 Core.vars.set('cmd_queue_console', con);
                 Core.vars.set('cmd_queue', Core.vars.get('cmd_queue').concat(cmds));
-				return '';
+                return Core.vars.set('last_cmd_resolve', true);
 			}
 
-			con.noinvite();
+            cmd = cmd.trim();
 
-			var args = cmd.trim().replace(/ "(.*?)" /g, '\n$1\n').replace(/ "(.*?)"/g, "\n$1").split("\n");
+			con.noInvite();
+
+            for(var i in _alias) {
+                if(cmd.substr(0, i.length + 1) === i + ' ' || cmd === i)
+                    cmd = _alias[i] + cmd.substr(i.length);
+            }
+
+            var data;
+
+            if(cmd.split('<').length > 1 && cmd.split('<')[0].substr(-1) !== '\\') {
+                cmd = cmd.replace(/<(.*)$/, App.readFile(cmd.split('<')[1].trim())).trim();
+            }
+
+            if(cmd.split('>>').length > 1 && cmd.split('>>')[0].substr(-1) !== '\\') {
+                con.setRedirection(cmd.split('>>')[1].trim());
+                cmd = cmd.replace(/>>(.*)$/, '').trim();
+            } else if(cmd.split('>').length > 1 && cmd.split('>')[0].substr(-1) !== '\\') {
+                con.setRedirection(cmd.split('>')[1].trim(), true);
+                cmd = cmd.replace(/>(.*)$/, '').trim();
+            } else
+                con.noRedirection();
+
+            cmd = cmd.replace(/\\(<|>|>>)/, '$1');
+
+            var vars = Core.vars.all();
+
+            for(var i in vars) {
+                var e = '%' + i + '%';
+                while (cmd.indexOf(e) !== -1)
+                    cmd = cmd.substr(0, cmd.indexOf(e)) + vars[i] + cmd.substr(cmd.indexOf(e) + e.length);
+            }
+
+            cmd = cmd.replace(/(\\|)\$([0-9])/g, function(match) {
+                return (match.substr(0, 1) !== '\\') ? Core.vars.get(match) : match.substr(1);
+            });
+
+			var args = cmd.replace(/ "(.*?)" /g, '\n$1\n').replace(/ "(.*?)"/g, "\n$1").split("\n");
 			var n = args[0];
 
 			args.splice(0, 1);
@@ -1144,55 +1375,81 @@ var Core = new function() {
 
 			args.splice(0, 1);
 
-            console.log(args);
-
             for(var i in args)
-                args[i] = args[i].replace(/\-([0-9a-zA-Z])([0-9a-zA-Z])/g, function(match, first, last) {
-                    args.push('-' + last);
-                    return '-' + first;
-                });
-
-            console.log(args);
-            console.log('---');
+                while(args[i].match(/^\-([0-9a-zA-Z])([0-9a-zA-Z])/))
+                    args[i] = args[i].replace(/^\-([0-9a-zA-Z])([0-9a-zA-Z])/g, function(match, first, last) {
+                        args.push('-' + last);
+                        return '-' + first;
+                    });
 
 			var alias = Registry.read('commands/alias');
 
-			if(typeof(native[cmd_name]) !== 'function')
-				for(var i in alias) {
+            if(typeof(_macros[cmd_name]) !== 'undefined') {
+                for(var i = 0; i < 9; i++)
+                    Core.vars.set('$' + (i + 1), args[i]);
 
-					if(i.toUpperCase() == cmd_name.toUpperCase()) {
-						cmd_name = i;
-						break;
-					}
+                Core.vars.set('$0', cmd);
 
-					for(var j in alias[i])
-						if(alias[i][j].toUpperCase() == cmd_name.toUpperCase()) {
-							cmd_name = i;
-							break;
-						}
-					}
+                var queue = Core.vars.get('cmd_queue');
 
-			if(typeof(native[cmd_name]) !== 'function') {
+                for(var i = 0; i < _macros[cmd_name].length; i++) {
+                    var c = _macros[cmd_name][_macros[cmd_name].length - i - 1];
+
+                    if(queue.length)
+                        queue.shift(c)
+                    else
+                        queue = [c];
+                }
+
+                Core.vars.set('cmd_queue', queue);
+                Core.vars.set('last_cmd_resolve', true);
+
+                return true;
+            }
+
+            if(typeof(native[cmd_name]) !== 'function') {
+
+                for(var i in alias) {
+
+                    if(i.toUpperCase() == cmd_name.toUpperCase()) {
+                        cmd_name = i;
+                        break;
+                    }
+
+                    for(var j in alias[i])
+                        if(alias[i][j].toUpperCase() == cmd_name.toUpperCase()) {
+                            cmd_name = i;
+                            break;
+                        }
+                }
 
                 var sys_cmd;
                 var short_args = {};
                 var long_args  = {};
+                var all_args = args;
+                var args = clone(args);
+                var f_args = clone(args);
+                var n = 0;
 
                 for(var i in args)
                     if(args[i].substr(0, 2) == '--') {
                         long_args[args[i].substr(2).replace(/=(.*)$/, '')] = (args[i].indexOf('=') != -1) ? args[i].substr(args[i].indexOf('=') + 1) : true;
+                        f_args.splice(i - n, 1);
+                        n++;
                     } else if(args[i].substr(0, 1) == '-') {
                         short_args[args[i].substr(1).replace(/=(.*)$/, '')] = (args[i].indexOf('=') != -1) ? args[i].substr(args[i].indexOf('=') + 1) : true;
+                        f_args.splice(i - n, 1);
+                        n++;
                     }
+
+                args = f_args;
 
                 if(sys_cmd = (App.readFile('/system/cmd/' + cmd_name + '.js'))) {
 
                     def('sync', true);
                     def('disableInvite', disableInvite);
 
-                    Core.vars.set('last_cmd_resolve', false);
-
-                    createCallback(sys_cmd)(con, 0, args, short_args, long_args);
+                    createCallback(sys_cmd, long_args['help'])(con, 0, args, short_args, long_args, data);
 
                     Core.vars.set('last_cmd_sync', def('sync'));
 
@@ -1206,41 +1463,40 @@ var Core = new function() {
 
                     if (app && app.commandLine) {
 
-                        def('nextcb', createCallback(app.commandLine));
-                        def('nextcon', con);
-                        def('nextargs', args);
-                        def('nextshortargs', short_args);
-                        def('nextlongargs', long_args);
-                        def('disableInvite', disableInvite);
+                        def('nextcb', createCallback(app.commandLine, long_args['help']));
 
-                        if (!app.isSystem)
+                        if (!app.isSystem) {
+                            def('nextcon', con);
+                            def('nextargs', args);
+                            def('nextshortargs', short_args);
+                            def('nextlongargs', long_args);
+                            def('disableInvite', disableInvite);
+
                             Dialogs.confirm('Command line interpreter', 'The command you will run will be use the current application rights. Continue uniquely if you\'re sure about what you are doing.', function () {
                                 def('sync', true);
 
-                                Core.vars.set('last_cmd_resolve', false);
-
-                                def('nextcb')(def('nextcon'), 0, def('nextargs'), def('nextshortargs'), def('nextlongargs'));
+                                def('nextcb')(def('nextcon'), 0, def('nextargs'), def('nextshortargs'), def('nextlongargs'), def('nextdata'));
 
                                 Core.vars.set('last_cmd_sync', sync);
 
-                                if(def('sync'))
+                                if (def('sync') && !def('disableInvite'))
+                                    def('nextcon').invite();
+
+                                if (def('sync'))
                                     Core.vars.set('last_cmd_resolve', sync);
 
-                                if(def('sync') && !def('disableInvite'))
-                                    def('nextcon').invite();
                             });
-                        else {
-							var sync = true;
+                        } else {
+                            var sync = true;
+                            def('sync', true);
 
-                            Core.vars.set('last_cmd_resolve', false);
+                            def('nextcb')(con, 0, args, short_args, long_args, data);
 
-                            def('nextcb')(con, 0, args, short_args, long_args);
-
-                            if(sync)
-                                Core.vars.set('last_cmd_sync', sync);
-
-                            if(sync && !disableInvite)
+                            if(sync && def('sync') && !disableInvite)
                                 con.invite();
+
+                            if(sync && def('sync'))
+                                Core.vars.set('last_cmd_sync', sync);
                         }
                     } else {
                         con.error('Command not found : ' + cmd_name);
@@ -1249,17 +1505,40 @@ var Core = new function() {
                             con.invite();
                     }
                 }
-			} else {
-				native[cmd_name](args, con);
+            } else {
+                native[cmd_name](args, con);
 
                 Core.vars.set('last_cmd_sync', true);
                 Core.vars.set('last_cmd_resolve', true);
 
                 if(!disableInvite)
-    				con.invite();
-			}
+                    con.invite();
+            }
 
-		}
+
+		};
+
+        /**
+         * View a command help from it help's object
+         * @param {Console} con
+         * @param {object} help
+         */
+
+		this.viewObjHelp = function(con, help) {
+
+            con.write('<br /><strong>Description<br />===========</strong><br />');
+            con.text('   ' + help.description + '\n');
+            con.write('<strong>Synopsis<br />========</strong>');
+
+            if(help.main_argument)
+                con.write('<br />&nbsp;&nbsp;&nbsp;&nbsp;[...]' + (help.main_argument_optional ? ' [Optional]' : '') + '<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + help.main_argument.escapeHTML());
+
+            for (var i in help.parameters) {
+                var arg = help.parameters[i];
+                con.write('<br />&nbsp;&nbsp;&nbsp;&nbsp;<strong>' + (arg.short ? '-' + arg.short + (arg.has_value ? '=...' : '') : '') + ((arg.short && arg.long) ? ', ' : '') + (arg.long ? '--' + arg.long + (arg.has_value ? '=...' : '') : '') + (arg.optional ? ' [Optional]' : '') + '</strong><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + arg.description.escapeHTML());
+            }
+
+		};
 
 	};
 
@@ -1388,7 +1667,7 @@ var Core = new function() {
 
 		this.format = function(frame) {
 
-			var vars = Core.vars.vars();
+			var vars = Core.vars.all();
 
 			for(var i in vars)
 				frame = frame.replace(new RegExp('{{ ' + i + ' }}', 'gi'), vars[i]);
@@ -1439,7 +1718,7 @@ process.on('uncaughtException', function(e) {
 
 window.onerror = function(message, file, line, col, error) {
 
-	if(error.stack.contains('/system/app-launcher/launcher.html'))
+	if(error && error.stack && error.stack.contains('/system/app-launcher/launcher.html'))
 		if(typeof(appLauncher) !== 'undefined' && typeof(sys) !== 'undefined' && sys.appError)
 			sys.appError(message, file, line, col, error, window);
 	else

@@ -35,7 +35,7 @@ var Storage = new function() {
 	/**
 	 * Know if a path exists AND is a directory
 	 * @param {string} path The path to test
-	 * @returns {Boolean} true if the specified path is a directory
+	 * @returns {Boolean}
 	 */
 
 	this.directoryExists = function(path) {
@@ -45,6 +45,8 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return false;
 		}
 
@@ -53,7 +55,7 @@ var Storage = new function() {
 	/**
 	 * Know if a path exists AND is a file
 	 * @param {string} path The path to test
-	 * @returns {Boolean} true if the specified path is a file
+	 * @returns {Boolean}
 	 */
 
 	this.fileExists = function(path) {
@@ -63,6 +65,8 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return false;
 		}
 
@@ -71,7 +75,7 @@ var Storage = new function() {
 	/**
 	  * Know if a path exists
 	  * @param {string} path The path to test
-	  * @returns {Boolean} true if the specified path exists
+	  * @returns {Boolean}
 	  */
 
 	this.exists = function(path) {
@@ -84,7 +88,8 @@ var Storage = new function() {
 	 * Write a value in a file
 	 * @param {string} file
 	 * @param {string} value
-	 * @returns {Boolean} Success of writing
+     * @param {string} [charset] Encoding
+	 * @returns {Boolean}
 	 */
 
 	this.writeFile = function(_cert, file, value, charset) {
@@ -95,6 +100,7 @@ var Storage = new function() {
 
 		if(!path) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -111,15 +117,56 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return false;
 		}
 	}
+
+    /**
+     * Write a value at the end of a file
+     * @param {string} file
+     * @param {string} value
+     * @param {string} [charset] Encoding
+     * @returns {Boolean}
+     */
+
+    this.appendFile = function(_cert, file, value, charset) {
+
+        App.pushStack(0);
+
+        var path = authorize('appendFile');
+
+        if(!path) {
+            App.pushStack(-1);
+            App.pushError(System.errors.NOPERM);
+            return false;
+        }
+
+        if(this.directoryExists(path))
+            return false;
+        //throw new Error('The path doesn\'t exists [' + path + ']');
+
+        if(!charset)
+            charset = System.defaultCharset;
+
+        try {
+            fs.appendFileSync(path, value, charset);
+            return true;
+        }
+
+        catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
+            return false;
+        }
+    }
 
 	/**
 	  * Read a file
 	  * @param {string} file
 	  * @param {string} charset
-	  * @returns {string}
+	  * @returns {string|boolean}
 	  */
 
 	this.readFile = function(_cert, file, charset) {
@@ -130,6 +177,7 @@ var Storage = new function() {
 		
 		if(!path) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -145,6 +193,8 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return false;
 		}
 
@@ -164,6 +214,7 @@ var Storage = new function() {
 
 		if(!path) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -175,6 +226,8 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return false;
 		}
 
@@ -185,7 +238,7 @@ var Storage = new function() {
 	  * @param {string} srcFile File path
 	  * @param {string} destFile File destination
 	  * @param {Number} BUFF_LENGTH Buffer length. If not specified, BUFF_LENGTH equals System.FileSystem.defaultBufferLength
-	  * @returns {Boolean} Return true if sucess
+	  * @returns {Boolean}
 	  */
 
 	this.copyFile = function(_cert, srcFile, destFile, BUFF_LENGTH) {
@@ -196,6 +249,7 @@ var Storage = new function() {
 
 		if(!srcFile) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -209,6 +263,7 @@ var Storage = new function() {
 
 		if(!_cert.hasAccess(destFile)) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return Debug.error(System.errors.NOPERM, destFile);
 		}
 			//throw new Error(System.errors.NOPERM);
@@ -252,7 +307,7 @@ var Storage = new function() {
 	  * @param {string} srcFile File path
 	  * @param {string} destFile File destination
 	  * @param {Number} BUFF_LENGTH Buffer length. If not specified, BUFF_LENGTH equals System.FileSystem.defaultBufferLength
-	  * @returns {Boolean} Return true if sucess
+	  * @returns {Boolean}
 	  */
 
 	this.moveFile = function(_cert, srcFile, destFile, BUFF_LENGTH) {
@@ -263,6 +318,7 @@ var Storage = new function() {
 
 		if(!srcFile) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -276,6 +332,7 @@ var Storage = new function() {
 
 		if(!_cert.hasAccess(destFile)) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return Debug.error(System.errors.NOPERM, destFile);
 			//throw new Error(System.errors.NOPERM);
 		}
@@ -317,7 +374,7 @@ var Storage = new function() {
 	/**
 	  * Get informations from a file, such as size...
 	  * @param {string} path The file path
-	  * @returns {Boolean|Object} Return false if an error occured, else return an object which contains many informations on the file
+	  * @returns {Boolean|Object}
 	  */
 
 	this.getFileInformations = function(_cert, path) {
@@ -328,6 +385,7 @@ var Storage = new function() {
 
 		if(!path) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -346,6 +404,8 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return Debug.error('Internal error | ' + new String(e));
 		}
 
@@ -354,7 +414,7 @@ var Storage = new function() {
 	/**
 	  * Get the size of a file
 	  * @param {string} path The file path
-	  * @returns {Boolean|Object} Return false if an error occured, else return the file size
+	  * @returns {Boolean|Object}
 	  */
 
 	this.getFileSize = function(_cert, directory) {
@@ -365,6 +425,7 @@ var Storage = new function() {
 
 		if(!path) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -378,6 +439,8 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return Debug.error('Internal error | ' + new String(e));
 		}
 
@@ -397,6 +460,7 @@ var Storage = new function() {
 
 		if(!path) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -410,18 +474,34 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return false;
 		}
 
 	}
 
 	/**
-	  * Delete an empty directory
+	  * Remove a directory
 	  * @param {string} directory
 	  * @returns {Boolean}
 	  */
 
 	this.removeDir = function(_cert, directory) {
+
+		var deleteFolderRecursive = function(path) {
+			if( fs.existsSync(path) ) {
+				fs.readdirSync(path).forEach(function(file,index){
+					var curPath = path + "/" + file;
+					if(fs.lstatSync(curPath).isDirectory()) { // recurse
+						deleteFolderRecursive(curPath);
+					} else { // delete file
+						fs.unlinkSync(curPath);
+					}
+				});
+				fs.rmdirSync(path);
+			}
+		};
 
 		App.pushStack(0);
 
@@ -429,6 +509,7 @@ var Storage = new function() {
 
 		if(!path) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -437,11 +518,13 @@ var Storage = new function() {
 			//throw new Error('The path doesn\'t exists [' + path + ']');
 
 		try {
-			fs.rmdirSync(path);
+			deleteFolderRecursive(path);
 			return true;
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return false;
 		}
 
@@ -450,7 +533,7 @@ var Storage = new function() {
 	/**
 	  * Read a directory
 	  * @param {string} directory
-	  * @returns {Array}
+	  * @returns {Array|boolean}
 	  */
 
 	this.readDir = function(_cert, directory) {
@@ -461,6 +544,7 @@ var Storage = new function() {
 
 		if(!path) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -473,6 +557,8 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return false;
 		}
 
@@ -481,7 +567,7 @@ var Storage = new function() {
 	/**
 	  * Return files list from directory
 	  * @param {string} directory
-	  * @returns {Array}
+	  * @returns {Array|Boolean}
 	  */
 
 	this.readDirFiles = function(_cert, directory) {
@@ -492,6 +578,7 @@ var Storage = new function() {
 
 		if(!path) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -506,6 +593,8 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return Debug.error('Cannot read directory : ' + new String(e));
 		}
 
@@ -514,7 +603,7 @@ var Storage = new function() {
 	/**
 	  * Return directorys list from directory
 	  * @param {string} directory
-	  * @returns {Array}
+	  * @returns {Array|boolean}
 	  */
 
 	this.readSubDirs = function(_cert, directory) {
@@ -525,6 +614,7 @@ var Storage = new function() {
 
 		if(!path) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
@@ -539,6 +629,8 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return Debug.error('Cannot read directory : ' + new String(e));
 		}
 
@@ -548,7 +640,7 @@ var Storage = new function() {
 	  * Rename a file or a directory
 	  * @param {string} old_name Old name
 	  * @param {string} new_name New name
-	  * @returns {Boolean} Return true if success
+	  * @returns {Boolean}
 	  */
 
 	this.rename = function(_cert, old_name, new_name) {
@@ -577,6 +669,8 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			return false;
 		}
 
@@ -587,7 +681,8 @@ var Storage = new function() {
 	  * @param {string} path directory path
 	  * @param {Object} options Watcher options
 	  * @param {function} callback Callback - Called when a file is modified in the path
-	  */
+	  * @returns {function|boolean}
+      */
 
 	this.watchDir = function(_cert, path, options, callback) {
 
@@ -597,13 +692,14 @@ var Storage = new function() {
 
 		if(!path) {
 			App.pushStack(-1);
+			App.pushError(System.errors.NOPERM);
 			return false;
 		}
 
 		if(typeof(options) === 'undefined')
 			var options = {};
 
-		watchdir.watchDirectory(path, options, callback);
+		return watchdir.watchDirectory(path, options, callback);
 
 	}
 
@@ -611,7 +707,7 @@ var Storage = new function() {
 	  * Load an application frame
 	  * @param {string} name Frame name (without extension)
 	  * @param {Object} context DOM Element
-      * @returns {Boolean} Return true if success
+      * @returns {Boolean}
 	  */
 
 	this.loadFrame = function(_cert, name, context) {
@@ -636,6 +732,8 @@ var Storage = new function() {
 		}
 
 		catch(e) {
+            e.error = System.errors.NATIVE[e.code];
+            App.pushError(e);
 			//throw new Error('Can\'t load application frame [' + path + ']<br /><br />Details :<br /><br />' + e.message);
 			return Debug.error('Cannot load application frame : ' + new String(e));
 		}

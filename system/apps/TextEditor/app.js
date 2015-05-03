@@ -57,7 +57,7 @@ function openFile(name, force) {
 
 	var f = App.readFile(name);
 
-	if(!f)
+	if(!f && typeof(f) !== 'string')
 		return Dialogs.error('Text Editor', 'Can\'t open ' + name + ' file');
 
 	changes = false;

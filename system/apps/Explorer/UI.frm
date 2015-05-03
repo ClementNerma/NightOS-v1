@@ -21,6 +21,8 @@
 
 <script type="text/javascript">
 
+window.watchExplorerDir = false;
+
 $('#links span').click(function() {
 
 	if(this.innerText.substr(2) === 'Home')

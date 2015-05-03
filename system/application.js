@@ -12,6 +12,7 @@ var Application = function(certificate, app) {
 	this.app = app;
 
 	this.stacks = [];
+    this.errors = [];
 	
 }
 
@@ -24,6 +25,18 @@ Application.prototype.popStack = function(stack) { return this.stacks.pop(); }
 Application.prototype.lastStack = function(n) {
 
 	return (typeof(n) !== 'undefined') ? (this.stacks[this.stacks.length - 1] === n) : this.stacks[this.stacks.length - 1];
+
+}
+
+/* Application stacks */
+
+Application.prototype.pushError = function(error) { return this.errors.push(error); }
+
+Application.prototype.popError = function(error) { return this.errors.pop(); }
+
+Application.prototype.lastError = function(n) {
+
+	return (typeof(n) !== 'undefined') ? (this.errors[this.errors.length - 1] === n) : this.errors[this.errors.length - 1];
 
 }
 
@@ -60,7 +73,7 @@ Application.prototype.quit = function() {
 /**
   * Load a frame which is in the same directory
   * @param {string} name The frame name (ex: the name is "UI" if the frame file is "UI.frm")
-  * @param {Object} context [Optionnal] The node where the frame will be loaded. Default : document.body
+  * @param {Object} context [optional] The node where the frame will be loaded. Default : document.body
   */
 
 Application.prototype.loadFrame = function(name, context) { return Storage.loadFrame(this.certificate, name, context); }
@@ -82,11 +95,22 @@ Application.prototype.watchDir = function(path, options, callback) { return Stor
  * Write a value in a file
  * @param {string} file
  * @param {string} value
- * @param {string} charset [Optionnal] Change the default write charset. Default : utf8
+ * @param {string} charset [optional] Change the default write charset. Default : utf8
  * @returns {Boolean} Success of writing
  */
 
 Application.prototype.writeFile = function(file, value, charset) { return Storage.writeFile(this.certificate, file, value, charset); }
+
+
+/**
+ * Add a value to the end of a file
+ * @param {string} file
+ * @param {string} value
+ * @param {string} charset [optional] Change the default write charset. Default : utf8
+ * @returns {Boolean} Success of writing
+ */
+
+Application.prototype.appendFile = function(file, value, charset) { return Storage.appendFile(this.certificate, file, value, charset); }
 
 /**
   * Read a file
@@ -167,7 +191,7 @@ Application.prototype.readDirFiles = function(path) { return Storage.readDirFile
 Application.prototype.readSubDirs = function(path) { return Storage.readSubDirs(this.certificate, path); }
 
 /**
-  * Remove an empty directory
+  * Remove a directory
   * @param {string} directory
   * @returns {Boolean}
   */
