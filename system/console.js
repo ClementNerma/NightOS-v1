@@ -114,7 +114,7 @@ var Console = function(context, setDefaultInvite, readOnly) {
         if(!_redirection)
             _console.innerHTML += (noJump ? '' : '<br />') + text;
         else
-            App.appendFile(_redirection, (noJump ? '' : '\n') + text);
+            App.appendFile(_redirection, (noJump ? '' : '\n') + text.toPlainText());
 
         this.on('write')(text);
 
@@ -131,7 +131,7 @@ var Console = function(context, setDefaultInvite, readOnly) {
         if(!_redirection)
             _console.innerHTML += (noJump ? '' : '<br />') + text.escapeHTML().replace(/ /g, String.fromCharCode(160)).replace(/\\n|\\r/g, '<br/>').replace(/\n|\r/g, '<br/>');
         else
-            App.appendFile(_redirection, (noJump ? '' : '\n') + text);
+            App.appendFile(_redirection, (noJump ? '' : '\n') + text.toPlainText());
 
 			this.on('write')(text);
 
@@ -148,7 +148,7 @@ var Console = function(context, setDefaultInvite, readOnly) {
         if(!_redirection)
             _console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: green;">' + text + '</span>';
         else
-            App.appendFile(_redirection, (noJump ? '' : '\n') + text);
+            App.appendFile(_redirection, (noJump ? '' : '\n') + text.toPlainText());
 
         this.on('success')(text);
 
@@ -165,7 +165,7 @@ var Console = function(context, setDefaultInvite, readOnly) {
         if(!_redirection)
             _console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: yellow;">' + text + '</span>';
         else
-            App.appendFile(_redirection, (noJump ? '' : '\n') + text);
+            App.appendFile(_redirection, (noJump ? '' : '\n') + text.toPlainText());
 
         this.on('warn')(text);
 
@@ -182,7 +182,7 @@ var Console = function(context, setDefaultInvite, readOnly) {
         if(!_redirection)
             _console.innerHTML += (noJump ? '' : '<br />') + '<span style="color: red;">' + text + '</span>';
         else
-            App.appendFile(_redirection, (noJump ? '' : '\n') + text);
+            App.appendFile(_redirection, (noJump ? '' : '\n') + text.toPlainText());
 
         this.on('error')(text);
 		return false;

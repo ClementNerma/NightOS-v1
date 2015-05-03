@@ -64,17 +64,17 @@ function run() {
 
         return output.text(Core.applications.exists(args[1]).toString());
 
-    } else if (app = arg('l', 'launch')) {
+    } else if (args[0] === 'launch') {
 
         // Launch an application
 
-        if (!app)
+        if (!args[1])
             return output.error('No application name specified');
 
-        if (!Core.applications.exists(app))
-            return output.error('The application [' + app.escapeHTML() + '] is not installed on this computer');
+        if (!Core.applications.exists(args[1]))
+            return output.error('The application [' + args[1].escapeHTML() + '] is not installed on this computer');
 
-        return Core.applications.launch(app, {
+        return Core.applications.launch(args[1], {
             origin: 'CommandLine',
             from: 'ApplicationPackage'
         });

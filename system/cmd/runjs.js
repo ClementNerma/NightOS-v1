@@ -32,20 +32,23 @@ function run() {
 
 var help = {
     description: 'Run a JavaScript code',
-    main_argument: 'The JavaScript code',
+    main_arguments: [
+        {
+            name: 'code',
+            description: 'The JavaScript code'
+        }
+    ],
     parameters: [
         {
             short: 'c',
             long: 'closure',
             description: 'Run the JavaScript in an anonymous function (closure)',
-            has_value: false,
             optional: true
         },
         {
             short: 'g',
             long: 'global',
             description: 'Run the JavaScript code in global window context',
-            has_value: false,
             optional: true
         }
     ]

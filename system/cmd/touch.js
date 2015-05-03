@@ -18,5 +18,10 @@ function run() {
 
 var help = {
     description: 'Create a file',
-    main_argument: 'The file path'
+    main_arguments: [
+        {
+            name: 'path',
+            description: 'The file path'
+        }
+    ]
 }

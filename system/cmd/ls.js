@@ -38,21 +38,24 @@ function run() {
 
 var help = {
     description: 'List files and directories',
-    main_argument: 'Directory path',
-    main_argument_optional: true,
+    main_arguments: [
+        {
+            name: 'path',
+            description: 'The directory path',
+            optional: true
+        }
+    ],
     parameters: [
         {
             short: 'd',
             long: 'details',
             description: 'View entries details (size, type, etc.)',
-            has_value: false,
             optional: true
         },
         {
             short: 'c',
             long: 'color',
             description: 'Color output. Require -d parameter',
-            has_value: false,
             optional: true
         }
     ]

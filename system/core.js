@@ -792,7 +792,7 @@ var Core = new function() {
 
 			var d = new Date();
 
-			if(Registry.write('applications/' + name, {
+			if(Registry.write('applications/' + package.name, {
 
 				installed: {
 					str: d.toString(),
@@ -1315,7 +1315,7 @@ var Core = new function() {
             }
 
             function createCallback(content, help) {
-                return new Function(['output', 'arg_index', 'args', 'short_args', 'long_args', 'data'], 'function arg(short, long) { return (short_args[short] || long_args[long]); }\nfunction END() { Core.vars.set("last_cmd_sync", def("sync")); if(!def("disableInvite")) { output.invite(); } Core.vars.set("last_cmd_resolve", true); }\n' + content + "\n" + (help ? 'if(typeof(help) === "object") { Core.commandLine.viewObjHelp(output, help); } else { run(); }' : 'run();'));
+                return new Function(['output', 'arg_index', 'args', 'short_args', 'long_args'], 'function arg(short, long) { return (short_args[short] || long_args[long]); }\nfunction END() { Core.vars.set("last_cmd_sync", def("sync")); if(!def("disableInvite")) { output.invite(); } Core.vars.set("last_cmd_resolve", true); }\n' + content + "\n" + (help ? 'if(typeof(help) === "object") { help.cmd = "' + cmd_name + '"; Core.commandLine.viewObjHelp(output, help); } else { run(); }' : 'run();'));
             }
 
 			if(!(con instanceof Console))
@@ -1530,14 +1530,31 @@ var Core = new function() {
 
             con.write('<br /><strong>Description<br />===========</strong><br />');
             con.text('   ' + help.description + '\n');
-            con.write('<strong>Synopsis<br />========</strong>');
 
-            if(help.main_argument)
-                con.write('<br />&nbsp;&nbsp;&nbsp;&nbsp;[...]' + (help.main_argument_optional ? ' [Optional]' : '') + '<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + help.main_argument.escapeHTML());
+			con.write('<strong>Synopsis<br />========</strong><br />');
+
+            var syn = help.cmd;
+
+            for(var i in help.main_arguments) {
+                syn += ' [' + help.main_arguments[i].name + ']';
+            }
+
+            for(var i in help.parameters) {
+                var arg = help.parameters[i];
+                syn += ' [' + (arg.short ? '-' + arg.short + (arg.has_value ? '=' + arg.has_value : '') : '') + (arg.short && arg.long ? ' <strong>|</strong> ' : '') + (arg.long ? '--' + arg.long + (arg.has_value ? '=' + arg.has_value : '') : '') + ']';
+            }
+
+            con.write('&nbsp;&nbsp;&nbsp;&nbsp;' + syn + '<br />');
+            con.write('<strong>Parameters<br />==========</strong>');
+
+            for (var i in help.main_arguments) {
+                var arg = help.main_arguments[i];
+                con.write('<br />&nbsp;&nbsp;&nbsp;&nbsp;<strong>[' + arg.name + ']' + (arg.optional ? ' [Optional]' : '') + '</strong><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + arg.description.escapeHTML());
+            }
 
             for (var i in help.parameters) {
                 var arg = help.parameters[i];
-                con.write('<br />&nbsp;&nbsp;&nbsp;&nbsp;<strong>' + (arg.short ? '-' + arg.short + (arg.has_value ? '=...' : '') : '') + ((arg.short && arg.long) ? ', ' : '') + (arg.long ? '--' + arg.long + (arg.has_value ? '=...' : '') : '') + (arg.optional ? ' [Optional]' : '') + '</strong><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + arg.description.escapeHTML());
+                con.write('<br />&nbsp;&nbsp;&nbsp;&nbsp;<strong>' + (arg.short ? '-' + arg.short + (arg.has_value ? '=' + arg.has_value : '') : '') + ((arg.short && arg.long) ? ', ' : '') + (arg.long ? '--' + arg.long + (arg.has_value ? '=...' : '') : '') + (arg.optional ? ' [Optional]' : '') + '</strong><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + arg.description.escapeHTML());
             }
 
 		};

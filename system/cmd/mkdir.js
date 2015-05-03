@@ -46,13 +46,17 @@ function run() {
 
 var help = {
     description: 'Make a directory',
-    main_argument: 'The directory path',
+    main_arguments: [
+        {
+            name: 'path',
+            description: 'The directory path'
+        }
+    ],
     parameters: [
         {
             short: 'r',
             long: 'recursive',
             description: 'If the directory parents doesn\'t exists, the command make them',
-            has_value: false,
             optional: true
         }
     ]
