@@ -848,7 +848,7 @@ var Core = new function() {
 
             con.text('Requesting server...');
 
-            return request('http://nightos.890.com/backend/get.php?name=' + name, function(error, response, body) {
+            return request('http://nightos.890m.com/store/backend/get.php?name=' + name, function(error, response, body) {
 
                 var output = def('server_install_con');
                 var err;
@@ -859,6 +859,8 @@ var Core = new function() {
                         return def('server_install_error')(0);
                     } }
                     catch(e) {}
+
+					console.log(body);
 
                     Core.applications.installFromPackage(body, output);
                     return def('server_install_success')();
