@@ -1,3 +1,6 @@
+# This is an old version of NightOS which is no longer maintained.
+Please use the [new version](https://github.com/ClementNerma/NightOS) instead.
+
 # NightOS
 
 NightOS is an open-source operating system based on NodeJS technology.
@@ -30,4 +33,4 @@ I've minutetly studied the projet and if your computer encounter a problem with 
 
 # Roadmap and documentation
 
-NightOS documentation and roadmap are available [here](https://github.com/ClementNerma/NightOS/wiki)
+NightOS documentation and roadmap are available [here](https://github.com/ClementNerma/NightOS-deprecated/wiki)
